@@ -1,0 +1,26 @@
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/schemas/
+*.log
+.env
+.env.*
+!.env.example
+
+# Signing material must never be committed
+*.key
+*.key.pub.bak
+.tauri/
+
+# Bloom Native World Engine build output and dev game directory
+bloom-performance-engine/java/build/
+bloom-performance-engine/java/.gradle/
+bloom-performance-engine/java/run/
+bloom-performance-engine/native/target/
+src-tauri/resources/engine/
+
+# Local-only: IDE output, personal screenshots, scratch files
+bloom-performance-engine/java/bin/
+immagini/
+main.txt
+.qodo/

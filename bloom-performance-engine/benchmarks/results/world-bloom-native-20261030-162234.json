@@ -1,0 +1,146 @@
+{
+  "scene": "world",
+  "minecraft": "26.3",
+  "engine": "ACTIVE",
+  "engineReason": "active",
+  "renderDistance": 16,
+  "graphicsBackendOption": "DEFAULT",
+  "cpuThreads": 12,
+  "maxHeapMb": 4080,
+  "remeshAllSectionsMs": 558.2374,
+  "remeshTimedOut": false,
+  "remesh": {
+    "engineStatus": "ACTIVE",
+    "engineReason": "active",
+    "compileNativeMs": {
+      "count": 785,
+      "mean": 4.979441094147583,
+      "p50": 3.347,
+      "p95": 16.205,
+      "p99": 46.5234,
+      "max": 71.462,
+      "totalMs": 3913.8407
+    },
+    "compileVanillaMs": {
+      "count": 0
+    },
+    "snapshotMs": {
+      "count": 786,
+      "mean": 2.324307994923858,
+      "p50": 1.0776,
+      "p95": 5.1847,
+      "p99": 41.2194,
+      "max": 51.4171,
+      "totalMs": 1831.5547
+    },
+    "nativeMeshMs": {
+      "count": 788,
+      "mean": 0.7312684010152285,
+      "p50": 0.5245,
+      "p95": 1.095,
+      "p99": 10.1056,
+      "max": 33.3515,
+      "totalMs": 576.2395
+    },
+    "nativeBlocks": 1703081,
+    "demotedBlocks": 161,
+    "frames": {
+      "count": 130,
+      "avgFps": 250.5890287882459,
+      "onePercentLowFps": 71.05452013329828,
+      "frameTimeMs": {
+        "p99": 9.4682,
+        "p50": 3.5233,
+        "max": 14.0737
+      },
+      "mainThreadWorkMsP50": 3.4976,
+      "stutters": 0
+    },
+    "heapUsedMb": 883,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.5590472631160213,
+    "native": {
+      "sectionsMeshed": 788,
+      "sectionsRejected": 0,
+      "nativeBlocks": 1703081,
+      "demotedBlocks": 161,
+      "quads": 627940,
+      "culledFaces": 9579285,
+      "vertexBytes": 70306096,
+      "modelsRegistered": 141,
+      "meshCount": 788,
+      "meshMeanNs": 687428,
+      "meshP50Ns": 524287,
+      "meshP95Ns": 1048575,
+      "meshP99Ns": 10485759,
+      "meshMaxNs": 24551400
+    }
+  },
+  "rotate": {
+    "engineStatus": "ACTIVE",
+    "engineReason": "active",
+    "compileNativeMs": {
+      "count": 1305,
+      "mean": 3.454465593869732,
+      "p50": 3.3299,
+      "p95": 6.3571,
+      "p99": 8.5273,
+      "max": 54.6968,
+      "totalMs": 4508.0776
+    },
+    "compileVanillaMs": {
+      "count": 0
+    },
+    "snapshotMs": {
+      "count": 1305,
+      "mean": 1.1648681992337167,
+      "p50": 0.7572,
+      "p95": 3.4395,
+      "p99": 5.0679,
+      "max": 12.3766,
+      "totalMs": 1520.153
+    },
+    "nativeMeshMs": {
+      "count": 1305,
+      "mean": 0.4440779310344828,
+      "p50": 0.3945,
+      "p95": 0.7233,
+      "p99": 1.1725,
+      "max": 17.4221,
+      "totalMs": 579.5217
+    },
+    "nativeBlocks": 2795978,
+    "demotedBlocks": 103,
+    "frames": {
+      "count": 13832,
+      "avgFps": 462.6415633180201,
+      "onePercentLowFps": 107.69764214742544,
+      "frameTimeMs": {
+        "p99": 6.2037,
+        "p50": 1.8283,
+        "max": 50.5107
+      },
+      "mainThreadWorkMsP50": 1.8131,
+      "stutters": 2
+    },
+    "heapUsedMb": 983,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.0691089747032153,
+    "native": {
+      "sectionsMeshed": 1305,
+      "sectionsRejected": 0,
+      "nativeBlocks": 2795978,
+      "demotedBlocks": 103,
+      "quads": 1118760,
+      "culledFaces": 15547968,
+      "vertexBytes": 125279616,
+      "modelsRegistered": 207,
+      "meshCount": 1305,
+      "meshMeanNs": 441090,
+      "meshP50Ns": 393215,
+      "meshP95Ns": 720895,
+      "meshP99Ns": 1179647,
+      "meshMaxNs": 17418600
+    }
+  }
+}

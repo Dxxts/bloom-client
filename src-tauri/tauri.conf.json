@@ -1,0 +1,78 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Bloom Client",
+  "version": "0.1.0",
+  "identifier": "com.bloomclient.launcher",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Bloom Client",
+        "width": 1200,
+        "height": 760,
+        "minWidth": 980,
+        "minHeight": 640,
+        "center": true,
+        "decorations": false,
+        "shadow": true,
+        "resizable": true,
+        "visible": false,
+        "backgroundColor": "#0B0E0D",
+        "dragDropEnabled": false
+      }
+    ],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "font-src": "'self' data:",
+        "img-src": "'self' data: https://launchercontent.mojang.com",
+        "connect-src": "ipc: http://ipc.localhost",
+        "object-src": "'none'",
+        "base-uri": "'none'",
+        "frame-src": "'none'",
+        "form-action": "'none'"
+      },
+      "freezePrototype": true
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "Bloom Client",
+    "category": "Game",
+    "shortDescription": "Bloom Client launcher",
+    "longDescription": "A modern, lightweight and performance-focused Minecraft launcher.",
+    "copyright": "Copyright (c) Bloom Client. Not affiliated with Mojang Studios or Microsoft.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "webviewInstallMode": { "type": "downloadBootstrapper" },
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": false,
+        "languages": ["English", "Italian"]
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEYzQ0ZFNDUwMjdBODBGRTQKUldUa0Q2Z25VT1RQOHluTUk5MjNtVm9Velk0NUNFTWVCNGRqWmNyVHdOaW1WNHkyeFo0VDVNcjgK",
+      "endpoints": [],
+      "windows": { "installMode": "passive" }
+    }
+  }
+}

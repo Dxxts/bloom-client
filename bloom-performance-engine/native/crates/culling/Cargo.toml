@@ -1,0 +1,10 @@
+[package]
+name = "culling"
+description = "Section visibility (VisGraph port), frustum and distance culling."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+bloom-core.workspace = true

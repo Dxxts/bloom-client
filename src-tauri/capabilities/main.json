@@ -1,0 +1,17 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main",
+  "description": "Minimal permissions for the Bloom main window. All file system, process, network and dialog operations go through Bloom's own validated Rust commands; no generic plugin APIs are exposed to the frontend.",
+  "windows": ["main"],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "core:window:allow-minimize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-is-maximized",
+    "core:window:allow-start-dragging",
+    "core:window:allow-close",
+    "core:window:allow-show",
+    "core:window:allow-set-focus"
+  ]
+}

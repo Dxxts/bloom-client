@@ -1,0 +1,96 @@
+{
+  "scene": "world",
+  "minecraft": "26.3",
+  "engine": "OFF",
+  "engineReason": "disabled in config/bloom-engine.json",
+  "renderDistance": 16,
+  "graphicsBackendOption": "DEFAULT",
+  "cpuThreads": 12,
+  "maxHeapMb": 4080,
+  "remeshAllSectionsMs": 576.4279,
+  "remeshTimedOut": false,
+  "remesh": {
+    "engineStatus": "OFF",
+    "engineReason": "disabled in config/bloom-engine.json",
+    "compileNativeMs": {
+      "count": 0
+    },
+    "compileVanillaMs": {
+      "count": 717,
+      "mean": 6.138318384401114,
+      "p50": 4.3976,
+      "p95": 16.5546,
+      "p99": 34.6409,
+      "max": 206.2255,
+      "totalMs": 4407.3126
+    },
+    "snapshotMs": {
+      "count": 0
+    },
+    "nativeMeshMs": {
+      "count": 0
+    },
+    "nativeBlocks": 0,
+    "demotedBlocks": 0,
+    "frames": {
+      "count": 124,
+      "avgFps": 233.81681244704944,
+      "onePercentLowFps": 61.28314652187502,
+      "frameTimeMs": {
+        "p99": 16.2384,
+        "p50": 3.523,
+        "max": 16.3177
+      },
+      "mainThreadWorkMsP50": 3.5015,
+      "stutters": 0
+    },
+    "heapUsedMb": 963,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.6710678417893503,
+    "native": {
+      "unavailable": "UnsatisfiedLinkError"
+    }
+  },
+  "rotate": {
+    "engineStatus": "OFF",
+    "engineReason": "disabled in config/bloom-engine.json",
+    "compileNativeMs": {
+      "count": 0
+    },
+    "compileVanillaMs": {
+      "count": 1359,
+      "mean": 4.067535025754231,
+      "p50": 3.7679,
+      "p95": 7.4739,
+      "p99": 11.1126,
+      "max": 56.0638,
+      "totalMs": 5527.7801
+    },
+    "snapshotMs": {
+      "count": 0
+    },
+    "nativeMeshMs": {
+      "count": 0
+    },
+    "nativeBlocks": 0,
+    "demotedBlocks": 0,
+    "frames": {
+      "count": 14450,
+      "avgFps": 483.10690174142553,
+      "onePercentLowFps": 115.51481020194716,
+      "frameTimeMs": {
+        "p99": 6.1087,
+        "p50": 1.7406,
+        "max": 49.0814
+      },
+      "mainThreadWorkMsP50": 1.7262,
+      "stutters": 3
+    },
+    "heapUsedMb": 1819,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.06574485023217924,
+    "native": {
+      "unavailable": "UnsatisfiedLinkError"
+    }
+  }
+}

@@ -1,0 +1,277 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Bloom design tokens. Themes swap the raw values; utilities reference them
+   through @theme inline so `bg-surface`, `text-muted`, etc. follow the theme.
+   ------------------------------------------------------------------------- */
+/* Palette: neutral charcoal surfaces; mint is reserved for primary actions,
+   selected states and key highlights. */
+:root {
+  --bloom-bg: #0d0e11;
+  --bloom-bg-2: #101114;
+  --bloom-surface: #181a20;
+  --bloom-surface-hover: #22252c;
+  --bloom-surface-active: #2a2e36;
+  --bloom-overlay: #1b1d23;
+  --bloom-border: #1f2228;
+  --bloom-border-strong: #2c3039;
+  --bloom-primary: #65d99a;
+  --bloom-primary-hover: #7de3ab;
+  --bloom-primary-ink: #04190d;
+  --bloom-primary-soft: rgb(101 217 154 / 0.12);
+  --bloom-text: #f2f3f5;
+  --bloom-muted: #9a9ea8;
+  --bloom-faint: #5d616b;
+  --bloom-error: #f26d6d;
+  --bloom-warning: #f0c068;
+  --bloom-info: #7aa7ff;
+  color-scheme: dark;
+}
+
+:root[data-theme="midnight"] {
+  --bloom-bg: #070809;
+  --bloom-bg-2: #0a0b0d;
+  --bloom-surface: #121317;
+  --bloom-surface-hover: #1a1c21;
+  --bloom-surface-active: #22242a;
+  --bloom-overlay: #15161a;
+  --bloom-border: #17191d;
+  --bloom-border-strong: #23262c;
+}
+
+@theme inline {
+  --color-bg: var(--bloom-bg);
+  --color-bg-2: var(--bloom-bg-2);
+  --color-surface: var(--bloom-surface);
+  --color-surface-hover: var(--bloom-surface-hover);
+  --color-surface-active: var(--bloom-surface-active);
+  --color-overlay: var(--bloom-overlay);
+  --color-line: var(--bloom-border);
+  --color-line-strong: var(--bloom-border-strong);
+  --color-primary: var(--bloom-primary);
+  --color-primary-hover: var(--bloom-primary-hover);
+  --color-primary-ink: var(--bloom-primary-ink);
+  --color-primary-soft: var(--bloom-primary-soft);
+  --color-text: var(--bloom-text);
+  --color-muted: var(--bloom-muted);
+  --color-faint: var(--bloom-faint);
+  --color-error: var(--bloom-error);
+  --color-warning: var(--bloom-warning);
+  --color-info: var(--bloom-info);
+
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  --radius-xl: 12px;
+  --radius-2xl: 14px;
+
+  --animate-shimmer: shimmer 1.4s ease-in-out infinite;
+  --animate-pulse-soft: pulse-soft 1.6s ease-in-out infinite;
+  --animate-drift: drift 90s linear infinite;
+  --animate-twinkle: twinkle 3.2s ease-in-out infinite;
+  --animate-sheen: sheen 2.8s ease-in-out infinite;
+  --animate-float: float 5s ease-in-out infinite;
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(250%); }
+  }
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 0.9; }
+  }
+  @keyframes drift {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 1; }
+  }
+  @keyframes float {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -5px; }
+  }
+  @keyframes sheen {
+    0%, 55% { transform: translateX(-120%) skewX(-18deg); }
+    100% { transform: translateX(320%) skewX(-18deg); }
+  }
+}
+
+/* Filled call-to-action: mint deepening to emerald so white text stays
+   legible (about 3:1 or better behind the label), with the mint glow kept. */
+@layer components {
+  .bloom-cta {
+    background-image: linear-gradient(180deg, #5ccf8f 0%, #2fa968 52%, #1c8a51 100%);
+    color: #fff;
+    text-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      inset 0 -1px 0 rgb(0 0 0 / 0.18),
+      0 1px 2px rgb(0 0 0 / 0.35),
+      0 6px 18px -8px rgb(101 217 154 / 0.5);
+    transition: filter 150ms ease, box-shadow 200ms ease;
+  }
+  .bloom-cta:hover {
+    filter: brightness(1.08) saturate(1.05);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------------- */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bloom-bg);
+  color: var(--bloom-text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  user-select: none;
+  cursor: default;
+}
+
+input,
+textarea,
+[data-selectable] {
+  user-select: text;
+}
+
+::selection {
+  background: rgb(101 217 154 / 0.28);
+  color: var(--bloom-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--bloom-primary);
+  outline-offset: 2px;
+}
+/* Items inside scrolling menus would have an outer ring clipped. */
+[role="option"]:focus-visible {
+  outline-offset: -2px;
+}
+
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Custom scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bloom-border-strong) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bloom-border-strong);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #3a3f4a;
+}
+
+/* Range input */
+input[type="range"].bloom-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--bloom-primary) 0%,
+    var(--bloom-primary) var(--fill, 0%),
+    var(--bloom-surface-hover) var(--fill, 0%),
+    var(--bloom-surface-hover) 100%
+  );
+  outline: none;
+}
+input[type="range"].bloom-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--bloom-text);
+  border: 4px solid var(--bloom-primary);
+  box-shadow: 0 0 0 4px rgb(13 14 17 / 0.6);
+  transition: transform 120ms ease;
+}
+input[type="range"].bloom-range::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+input[type="range"].bloom-range:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--bloom-primary);
+  outline-offset: 2px;
+}
+
+/* Remote article typography (patch notes) */
+.bloom-prose {
+  color: var(--bloom-muted);
+  line-height: 1.65;
+  font-size: 14px;
+}
+.bloom-prose h1,
+.bloom-prose h2,
+.bloom-prose h3,
+.bloom-prose h4 {
+  color: var(--bloom-text);
+  font-weight: 700;
+  margin: 1.4em 0 0.5em;
+  line-height: 1.3;
+}
+.bloom-prose h1 { font-size: 20px; }
+.bloom-prose h2 { font-size: 17px; }
+.bloom-prose h3,
+.bloom-prose h4 { font-size: 15px; }
+.bloom-prose p { margin: 0.6em 0; }
+.bloom-prose ul,
+.bloom-prose ol { margin: 0.5em 0; padding-left: 1.3em; }
+.bloom-prose ul { list-style: disc; }
+.bloom-prose ol { list-style: decimal; }
+.bloom-prose li { margin: 0.25em 0; }
+.bloom-prose li::marker { color: var(--bloom-primary); }
+.bloom-prose a { color: var(--bloom-primary); text-decoration: underline; text-underline-offset: 2px; }
+.bloom-prose code {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: var(--bloom-surface-hover);
+  padding: 1px 5px;
+  border-radius: 5px;
+  color: var(--bloom-text);
+}
+.bloom-prose strong { color: var(--bloom-text); }
+
+/* Reduced motion: CSS animations follow the same setting as Motion. */
+:root[data-reduced-motion="on"] *,
+:root[data-reduced-motion="on"] *::before,
+:root[data-reduced-motion="on"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-reduced-motion="system"] *,
+  :root[data-reduced-motion="system"] *::before,
+  :root[data-reduced-motion="system"] *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

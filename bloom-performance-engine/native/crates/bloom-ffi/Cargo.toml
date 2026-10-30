@@ -1,0 +1,16 @@
+[package]
+name = "bloom-ffi"
+description = "JNI entry points of the Bloom Native World Engine (bloom_native library)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lib]
+name = "bloom_native"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+bloom-core.workspace = true
+chunk-mesher.workspace = true
+profiler.workspace = true

@@ -1,0 +1,15 @@
+{
+	"required": true,
+	"package": "com.bloomclient.engine.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"BlockStateBaseMixin",
+		"BufferBuilderMixin",
+		"MinecraftMixin",
+		"SectionCompilerMixin",
+		"VisibilitySetAccessor"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

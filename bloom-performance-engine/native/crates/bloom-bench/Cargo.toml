@@ -1,0 +1,13 @@
+[package]
+name = "bloom-bench"
+description = "Repeatable offline benchmark of the native mesher on synthetic scenes."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+bloom-core.workspace = true
+chunk-mesher.workspace = true
+world-processing.workspace = true

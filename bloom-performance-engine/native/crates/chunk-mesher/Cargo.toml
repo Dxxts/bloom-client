@@ -1,0 +1,11 @@
+[package]
+name = "chunk-mesher"
+description = "Vanilla-equivalent section mesher (face culling, smooth AO, light, tint, layers)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+bloom-core.workspace = true
+culling.workspace = true

@@ -1,0 +1,10 @@
+{
+  "tool": "bloom-bench",
+  "cpuThreads": 12,
+  "runs": 5,
+  "scenes": [
+    {"scene": "natural_terrain", "sections": 1024, "snapshotBytes": 55417, "quads": 388114, "nativeBlocks": 1096370, "demotedBlocks": 0, "vertexBytes": 43468768, "singleThreadMedianUs": 20.00, "singleThreadP95Us": 615.40, "singleThreadMeanUs": 192.81, "singleThreadSectionsPerS": 5186, "parallelThreads": 11, "parallelSectionsPerS": 31272, "allocsPerSectionReusedContext": 0.000, "allocsPerSectionFreshContext": 14.245},
+    {"scene": "large_builds", "sections": 1024, "snapshotBytes": 54280, "quads": 1065537, "nativeBlocks": 357219, "demotedBlocks": 0, "vertexBytes": 119340144, "singleThreadMedianUs": 48.50, "singleThreadP95Us": 1140.80, "singleThreadMeanUs": 342.72, "singleThreadSectionsPerS": 2918, "parallelThreads": 11, "parallelSectionsPerS": 15661, "allocsPerSectionReusedContext": 0.000, "allocsPerSectionFreshContext": 17.959},
+    {"scene": "transparent_blocks", "sections": 1024, "snapshotBytes": 68619, "quads": 8629347, "nativeBlocks": 1834760, "demotedBlocks": 0, "vertexBytes": 966486864, "singleThreadMedianUs": 2815.70, "singleThreadP95Us": 4660.80, "singleThreadMeanUs": 2518.54, "singleThreadSectionsPerS": 397, "parallelThreads": 11, "parallelSectionsPerS": 2634, "allocsPerSectionReusedContext": 0.000, "allocsPerSectionFreshContext": 51.966}
+  ]
+}

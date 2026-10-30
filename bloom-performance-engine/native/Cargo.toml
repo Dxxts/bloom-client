@@ -1,0 +1,35 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/bloom-core",
+    "crates/chunk-mesher",
+    "crates/culling",
+    "crates/world-processing",
+    "crates/profiler",
+    "crates/bloom-ffi",
+    "crates/bloom-bench",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Proprietary"
+rust-version = "1.82"
+
+[workspace.dependencies]
+bloom-core = { path = "crates/bloom-core" }
+chunk-mesher = { path = "crates/chunk-mesher" }
+culling = { path = "crates/culling" }
+world-processing = { path = "crates/world-processing" }
+profiler = { path = "crates/profiler" }
+
+[profile.release]
+opt-level = 3
+codegen-units = 1
+lto = "fat"
+# The JNI layer catches panics at the boundary; aborting would kill the game.
+panic = "unwind"
+debug = "line-tables-only"
+
+[profile.dev]
+debug = "line-tables-only"

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}} · Bloom Client</title>
+<style>
+  :root {
+    --bg: #0d0e11;
+    --card: rgba(24, 26, 32, 0.82);
+    --line: rgba(255, 255, 255, 0.08);
+    --text: #f2f3f5;
+    --muted: #9a9ea8;
+    --faint: #5d616b;
+    --mint: #65d99a;
+    --red: #f26d6d;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+      radial-gradient(60% 50% at 50% 0%, rgba(101, 217, 154, 0.14), transparent 70%),
+      radial-gradient(40% 40% at 85% 100%, rgba(101, 217, 154, 0.06), transparent 70%),
+      var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body.err {
+    background:
+      radial-gradient(60% 50% at 50% 0%, rgba(242, 109, 109, 0.12), transparent 70%),
+      var(--bg);
+  }
+  main {
+    width: min(420px, 100%);
+    padding: 36px 36px 30px;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent), var(--card);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 40px 80px -30px rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(20px);
+    animation: rise 0.7s var(--ease) both;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--muted);
+  }
+  .brand svg { width: 22px; height: 22px; filter: drop-shadow(0 0 10px rgba(101, 217, 154, 0.35)); }
+  .status {
+    width: 64px;
+    height: 64px;
+    margin: 28px auto 20px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(101, 217, 154, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(101, 217, 154, 0.3), 0 0 40px -8px rgba(101, 217, 154, 0.5);
+    animation: pop 0.6s 0.15s var(--ease) both;
+  }
+  .err .status {
+    background: rgba(242, 109, 109, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(242, 109, 109, 0.3), 0 0 40px -8px rgba(242, 109, 109, 0.45);
+  }
+  .status svg { width: 30px; height: 30px; fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+  .status path { stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw 0.55s 0.45s var(--ease) forwards; }
+  .ok .status svg { stroke: var(--mint); }
+  .err .status svg { stroke: var(--red); }
+  .ok .icon-err, .err .icon-ok { display: none; }
+  h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.015em; }
+  p { margin: 10px 0 0; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  .hint {
+    margin-top: 26px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    color: var(--faint);
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(18px) scale(0.98); filter: blur(8px); }
+    to { opacity: 1; transform: none; filter: none; }
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.6); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    main, .status { animation: none; }
+    .status path { animation: none; stroke-dashoffset: 0; }
+  }
+</style>
+</head>
+<body class="{{TONE}}">
+<main>
+  <div class="brand">
+    <svg viewBox="-170 -170 340 340" aria-hidden="true">
+      <g fill="#3E7A57">
+        <path d="M0 0C-38-40-38-104 0-132C38-104 38-40 0 0Z" transform="rotate(45)"/>
+        <path d="M0 0C-38-40-38-104 0-132C38-104 38-40 0 0Z" transform="rotate(135)"/>
+        <path d="M0 0C-38-40-38-104 0-132C38-104 38-40 0 0Z" transform="rotate(225)"/>
+        <path d="M0 0C-38-40-38-104 0-132C38-104 38-40 0 0Z" transform="rotate(315)"/>
+      </g>
+      <g fill="#78E6A5">
+        <path d="M0 0C-46-46-46-128 0-164C46-128 46-46 0 0Z"/>
+        <path d="M0 0C-46-46-46-128 0-164C46-128 46-46 0 0Z" transform="rotate(90)"/>
+        <path d="M0 0C-46-46-46-128 0-164C46-128 46-46 0 0Z" transform="rotate(180)"/>
+        <path d="M0 0C-46-46-46-128 0-164C46-128 46-46 0 0Z" transform="rotate(270)"/>
+      </g>
+      <circle r="30" fill="#0B0E0D"/>
+      <circle r="16" fill="#92F0B7"/>
+    </svg>
+    Bloom Client
+  </div>
+  <div class="status" aria-hidden="true">
+    <svg class="icon-ok" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+    <svg class="icon-err" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/></svg>
+  </div>
+  <h1>{{TITLE}}</h1>
+  <p>{{MESSAGE}}</p>
+  <div class="hint">You can close this tab.</div>
+</main>
+</body>
+</html>

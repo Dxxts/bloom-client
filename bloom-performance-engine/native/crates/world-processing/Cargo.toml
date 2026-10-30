@@ -1,0 +1,9 @@
+[package]
+name = "world-processing"
+description = "Bounded worker pool with dynamic priorities, de-duplication and cancellation."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]

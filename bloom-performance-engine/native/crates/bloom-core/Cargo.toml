@@ -1,0 +1,9 @@
+[package]
+name = "bloom-core"
+description = "Shared types and exact ports of Minecraft's color and light math."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]

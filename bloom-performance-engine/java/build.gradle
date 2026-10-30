@@ -1,0 +1,74 @@
+plugins {
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = 'bloom-engine'
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+loom {
+	runs {
+		client {
+			// The native library is loaded from the jar resources in production;
+			// in development it is read straight from the Cargo output directory.
+			property 'bloom.native.path', file("${project.bloom_native_dir}/bloom_native.dll").absolutePath
+			runDir 'run'
+		}
+		// Repeatable A/B benchmark (see BenchmarkController):
+		//   gradlew runBenchmark -Pbench.world="New World" -Pbench.engine=false   (vanilla)
+		//   gradlew runBenchmark -Pbench.world="New World" -Pbench.engine=true    (Bloom native)
+		benchmark {
+			client()
+			configName = 'Bloom Benchmark'
+			runDir 'run'
+			property 'bloom.native.path', file("${project.bloom_native_dir}/bloom_native.dll").absolutePath
+			property 'bloom.benchmark', project.findProperty('bench.scene') ?: 'world'
+			property 'bloom.benchmark.duration', project.findProperty('bench.duration') ?: '30'
+			property 'bloom.engine.enabled', project.findProperty('bench.engine') ?: 'true'
+			property 'bloom.engine.validateEvery', '0'
+			programArgs '--quickPlaySingleplayer', project.findProperty('bench.world') ?: 'New World'
+		}
+	}
+}
+
+// Packs the native library built by Cargo into the mod jar. Run
+// `cargo build --release -p bloom-ffi` (or scripts/build-native.ps1) first.
+def nativeLib = file("${project.bloom_native_dir}/bloom_native.dll")
+
+processResources {
+	def version = project.version
+	inputs.property 'version', version
+	filesMatching('fabric.mod.json') {
+		expand 'version': version
+	}
+	if (nativeLib.exists()) {
+		from(nativeLib) {
+			into 'natives/windows-x86_64'
+		}
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 25
+	it.options.encoding = 'UTF-8'
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+test {
+	useJUnitPlatform()
+}
