@@ -25,7 +25,8 @@ import org.lwjgl.system.MemoryUtil;
  *   <li>Frame time, FPS, 1% low and stutters on the main (render) thread.</li>
  *   <li>Heap and process CPU load.</li>
  * </ul>
- * GPU time and VRAM are not measured (no portable source in 26.3).
+ * Entity and particle stages, draw calls and GPU frame time come from
+ * {@link RenderStats} and {@link GpuFrameTimer}.
  */
 public final class EngineProfiler {
 	private static final Samples COMPILE_NATIVE = new Samples(1 << 16);
@@ -34,6 +35,8 @@ public final class EngineProfiler {
 	private static final Samples NATIVE_MESH = new Samples(1 << 16);
 	private static final LongAdder NATIVE_BLOCKS = new LongAdder();
 	private static final LongAdder DEMOTED_BLOCKS = new LongAdder();
+	private static final LongAdder NATIVE_FLUIDS = new LongAdder();
+	private static final LongAdder DEMOTED_FLUIDS = new LongAdder();
 
 	private static final int FRAMES = 1 << 15;
 	private static final long[] frameTimes = new long[FRAMES];
@@ -54,11 +57,34 @@ public final class EngineProfiler {
 		intervalNanos = intervalSeconds * 1_000_000_000L;
 	}
 
-	public static void recordNativeSection(long snapshotNanos, long meshNanos, int nativeBlocks, int demoted) {
+	public static void recordNativeSection(long snapshotNanos, long meshNanos, int nativeBlocks, int demoted, int nativeFluids, int demotedFluids) {
 		SNAPSHOT.add(snapshotNanos);
 		NATIVE_MESH.add(meshNanos);
 		NATIVE_BLOCKS.add(nativeBlocks);
 		DEMOTED_BLOCKS.add(demoted);
+		NATIVE_FLUIDS.add(nativeFluids);
+		DEMOTED_FLUIDS.add(demotedFluids);
+	}
+
+	/**
+	 * Running totals since the last reset: native compiles (count, ns),
+	 * vanilla compiles, snapshots, native meshing.
+	 */
+	public static long[] totals() {
+		return new long[] {COMPILE_NATIVE.count(), COMPILE_NATIVE.sum(), COMPILE_VANILLA.count(), COMPILE_VANILLA.sum(), SNAPSHOT.count(), SNAPSHOT.sum(),
+				NATIVE_MESH.count(), NATIVE_MESH.sum()};
+	}
+
+	public static long demotedBlocks() {
+		return DEMOTED_BLOCKS.sum();
+	}
+
+	public static long demotedFluids() {
+		return DEMOTED_FLUIDS.sum();
+	}
+
+	public static long vanillaSections() {
+		return COMPILE_VANILLA.count();
 	}
 
 	public static void recordCompile(boolean nativePath, long nanos) {
@@ -95,6 +121,10 @@ public final class EngineProfiler {
 		NATIVE_MESH.reset();
 		NATIVE_BLOCKS.reset();
 		DEMOTED_BLOCKS.reset();
+		NATIVE_FLUIDS.reset();
+		DEMOTED_FLUIDS.reset();
+		RenderStats.reset();
+		GpuFrameTimer.reset();
 		frameCount = 0;
 		lastFrameStart = 0;
 		try {
@@ -114,7 +144,13 @@ public final class EngineProfiler {
 		out.put("nativeMeshMs", NATIVE_MESH.summaryMs());
 		out.put("nativeBlocks", NATIVE_BLOCKS.sum());
 		out.put("demotedBlocks", DEMOTED_BLOCKS.sum());
+		out.put("nativeFluids", NATIVE_FLUIDS.sum());
+		out.put("demotedFluids", DEMOTED_FLUIDS.sum());
 		out.put("frames", frameSummary());
+		out.put("render", RenderStats.snapshot());
+		out.put("gpuFrame", GpuFrameTimer.snapshot());
+		out.put("validatedSections", com.bloomclient.engine.validation.MeshValidator.passed());
+		out.put("validationSkippedLightChanged", com.bloomclient.engine.validation.MeshValidator.skipped());
 		Runtime rt = Runtime.getRuntime();
 		out.put("heapUsedMb", (rt.totalMemory() - rt.freeMemory()) / (1024 * 1024));
 		out.put("heapMaxMb", rt.maxMemory() / (1024 * 1024));
@@ -160,7 +196,7 @@ public final class EngineProfiler {
 		try {
 			int n = NativeBridge.readStats(buf, Protocol.STATS_SLOTS);
 			String[] names = {"sectionsMeshed", "sectionsRejected", "nativeBlocks", "demotedBlocks", "quads", "culledFaces",
-					"vertexBytes", "modelsRegistered", "meshCount", "meshMeanNs", "meshP50Ns", "meshP95Ns", "meshP99Ns", "meshMaxNs"};
+					"vertexBytes", "modelsRegistered", "meshCount", "meshMeanNs", "meshP50Ns", "meshP95Ns", "meshP99Ns", "meshMaxNs", "nativeFluids", "demotedFluids"};
 			for (int i = 0; i < Math.min(n, names.length); i++) {
 				out.put(names[i], MemoryUtil.memGetLong(buf + i * 8L));
 			}
@@ -196,6 +232,14 @@ public final class EngineProfiler {
 			ring.set(Math.floorMod(next.getAndIncrement(), ring.length()), nanos);
 			count.increment();
 			sum.add(nanos);
+		}
+
+		long count() {
+			return count.sum();
+		}
+
+		long sum() {
+			return sum.sum();
 		}
 
 		void reset() {

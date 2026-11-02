@@ -1,0 +1,37 @@
+{
+  "engineStatus": "ACTIVE: active",
+  "database": "bundled (sequence 1, 4 entries)",
+  "databaseProblems": [],
+  "mods": [
+    {
+      "id": "lithium",
+      "version": "0.26.3+mc26.3",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "databaseStatus": "UNTESTED",
+      "knownIssues": [],
+      "vulkan": "UNTESTED",
+      "databaseTests": 0
+    }
+  ],
+  "fallbackStates": {
+    "CUSTOM_SKIP_RENDERING": 835,
+    "NATIVE": 34616,
+    "NOT_A_MODEL": 86,
+    "POSITION_DEPENDENT_SHADE": 186
+  },
+  "shaders": {
+    "coreShaderOverrides": "none (vanilla)",
+    "iris": "not installed",
+    "resourceReloads": "1"
+  },
+  "classScanComplete": true
+}

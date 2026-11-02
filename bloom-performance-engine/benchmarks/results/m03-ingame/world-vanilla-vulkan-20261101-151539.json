@@ -1,0 +1,209 @@
+{
+  "scene": "world",
+  "minecraft": "26.3",
+  "engine": "OFF",
+  "engineReason": "disabled in config/bloom-engine.json",
+  "renderDistance": 16,
+  "graphicsBackendOption": "VULKAN",
+  "cpuThreads": 12,
+  "maxHeapMb": 4080,
+  "remeshAllSectionsMs": 611.2854,
+  "remeshTimedOut": false,
+  "remesh": {
+    "engineStatus": "OFF",
+    "engineReason": "disabled in config/bloom-engine.json",
+    "compileNativeMs": {
+      "count": 0
+    },
+    "compileVanillaMs": {
+      "count": 550,
+      "mean": 8.249533818181819,
+      "p50": 5.2976,
+      "p95": 12.9239,
+      "p99": 83.8359,
+      "max": 327.1324,
+      "totalMs": 4537.2436
+    },
+    "snapshotMs": {
+      "count": 0
+    },
+    "nativeMeshMs": {
+      "count": 0
+    },
+    "nativeBlocks": 0,
+    "demotedBlocks": 0,
+    "nativeFluids": 0,
+    "demotedFluids": 0,
+    "frames": {
+      "count": 163,
+      "avgFps": 289.8046201257041,
+      "onePercentLowFps": 53.76517522070605,
+      "frameTimeMs": {
+        "p99": 10.2847,
+        "p50": 2.9862,
+        "max": 18.5994
+      },
+      "mainThreadWorkMsP50": 2.9218,
+      "stutters": 0
+    },
+    "render": {
+      "frames": 164,
+      "stagesPerFrame": {
+        "extract_entities": {
+          "meanMs": 0.16405060975609756,
+          "maxMs": 0.3831
+        },
+        "extract_block_entities": {
+          "meanMs": 0.027991463414634144,
+          "maxMs": 0.0843
+        },
+        "extract_particles": {
+          "meanMs": 0.04972682926829269,
+          "maxMs": 0.0654
+        },
+        "submit_entities": {
+          "meanMs": 0.01669390243902439,
+          "maxMs": 0.0869
+        },
+        "submit_block_entities": {
+          "meanMs": 2.451219512195122E-4,
+          "maxMs": 0.001
+        },
+        "submit_particles": {
+          "meanMs": 0.005503658536585366,
+          "maxMs": 0.0871
+        },
+        "prepare_features": {
+          "meanMs": 0.1874390243902439,
+          "maxMs": 0.3661
+        },
+        "execute_frame_graph": {
+          "meanMs": 0.25279024390243904,
+          "maxMs": 2.5076
+        }
+      },
+      "drawCallsPerFrame": 33.21341463414634,
+      "drawsPerFrame": 487.890243902439,
+      "entitiesPerFrame": 2.4390243902439024,
+      "blockEntitiesPerFrame": 0.0
+    },
+    "gpuFrame": {
+      "samples": 164,
+      "meanMs": 3.716858341463416,
+      "maxMs": 48.3432
+    },
+    "validatedSections": 0,
+    "validationSkippedLightChanged": 0,
+    "heapUsedMb": 1122,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.5121632513993366,
+    "native": {
+      "unavailable": "UnsatisfiedLinkError"
+    }
+  },
+  "rotate": {
+    "engineStatus": "OFF",
+    "engineReason": "disabled in config/bloom-engine.json",
+    "compileNativeMs": {
+      "count": 0
+    },
+    "compileVanillaMs": {
+      "count": 1596,
+      "mean": 4.399513533834587,
+      "p50": 3.9526,
+      "p95": 8.6051,
+      "p99": 15.7207,
+      "max": 57.178,
+      "totalMs": 7021.6236
+    },
+    "snapshotMs": {
+      "count": 0
+    },
+    "nativeMeshMs": {
+      "count": 0
+    },
+    "nativeBlocks": 0,
+    "demotedBlocks": 0,
+    "nativeFluids": 0,
+    "demotedFluids": 0,
+    "frames": {
+      "count": 14140,
+      "avgFps": 472.50075038733036,
+      "onePercentLowFps": 108.95859920970241,
+      "frameTimeMs": {
+        "p99": 6.5867,
+        "p50": 1.7293,
+        "max": 52.4508
+      },
+      "mainThreadWorkMsP50": 1.7044,
+      "stutters": 3
+    },
+    "render": {
+      "frames": 14141,
+      "stagesPerFrame": {
+        "extract_entities": {
+          "meanMs": 0.11718417367937203,
+          "maxMs": 14.8045
+        },
+        "extract_block_entities": {
+          "meanMs": 0.04065926030690899,
+          "maxMs": 0.5144
+        },
+        "extract_particles": {
+          "meanMs": 0.040817636659359315,
+          "maxMs": 0.6506
+        },
+        "submit_entities": {
+          "meanMs": 0.030151806802913513,
+          "maxMs": 4.6989
+        },
+        "submit_block_entities": {
+          "meanMs": 3.69514178629517E-4,
+          "maxMs": 0.1673
+        },
+        "submit_particles": {
+          "meanMs": 0.0020660420055158757,
+          "maxMs": 0.3126
+        },
+        "prepare_features": {
+          "meanMs": 0.16884946609150697,
+          "maxMs": 21.7786
+        },
+        "execute_frame_graph": {
+          "meanMs": 0.14024363906371545,
+          "maxMs": 6.9156
+        }
+      },
+      "drawCallsPerFrame": 30.11880347924475,
+      "drawsPerFrame": 1512.0560073545012,
+      "entitiesPerFrame": 7.097022841383212,
+      "blockEntitiesPerFrame": 0.0
+    },
+    "gpuFrame": {
+      "samples": 14141,
+      "meanMs": 2.1221491843575415,
+      "maxMs": 75.868352
+    },
+    "validatedSections": 0,
+    "validationSkippedLightChanged": 0,
+    "heapUsedMb": 1466,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.08355883907816855,
+    "native": {
+      "unavailable": "UnsatisfiedLinkError"
+    }
+  },
+  "vram": {
+    "source": "Vulkan VMA budget (device-local heaps)",
+    "usedMiB": 576,
+    "totalMiB": 4943
+  },
+  "gpuDevice": "NVIDIA GeForce GTX 1660 SUPER",
+  "gpuBackend": "Vulkan",
+  "nativeFluids": true,
+  "mods": [
+    "bloom-engine@0.2.0",
+    "fabricloader@0.20.1",
+    "mixinextras@0.5.5"
+  ]
+}

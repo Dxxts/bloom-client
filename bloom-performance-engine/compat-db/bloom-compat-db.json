@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "sequence": 2,
+  "generated": "2026-11-01",
+  "entries": [
+    {
+      "modId": "fabric-renderer-api-v1",
+      "versions": "17.0.17",
+      "loader": "fabric",
+      "minecraft": "26.3",
+      "status": "NATIVE_ADAPTER",
+      "adapterVersion": 1,
+      "knownIssues": [
+        "Needs Indigo with ambient-occlusion-mode=vanilla (config/fabric/indigo-renderer.properties). With the default 'hybrid' Indigo lights blocks differently from vanilla and Bloom turns off.",
+        "Models with a shade direction override are left to Indigo (Indigo drops the override)."
+      ],
+      "renderingFeatures": ["redirects ModelBlockRenderer.tesselateBlock to Indigo"],
+      "vulkan": "SUPPORTED",
+      "terrainHooksVerified": true,
+      "tests": [
+        {"date": "2026-11-01", "bloomVersion": "0.2.0", "backend": "vulkan", "result": "PASS", "notes": "fabric-api 0.165.0+26.3, Indigo ambient-occlusion-mode=vanilla: 2748 sections validated against the Indigo path, 0 differences"},
+        {"date": "2026-11-01", "bloomVersion": "0.2.0", "backend": "vulkan", "result": "FAIL", "notes": "default Indigo configuration (hybrid AO): smooth light differs from vanilla; Bloom turns off"}
+      ]
+    },
+    {
+      "modId": "fabric-rendering-v1",
+      "versions": "27.2.0",
+      "loader": "fabric",
+      "minecraft": "26.3",
+      "status": "NATIVE_ADAPTER",
+      "adapterVersion": 1,
+      "knownIssues": ["Blocks tinted through BlockColorRegistry factories are tesselated in Java."],
+      "renderingFeatures": ["BlockColorRegistry tint factories"],
+      "vulkan": "SUPPORTED",
+      "terrainHooksVerified": true,
+      "tests": [
+        {"date": "2026-11-01", "bloomVersion": "0.2.0", "backend": "vulkan", "result": "PASS", "notes": "with fabric-api 0.165.0+26.3, see fabric-renderer-api-v1"}
+      ]
+    },
+    {
+      "modId": "fabric-rendering-fluids-v1",
+      "versions": "6.0.6",
+      "loader": "fabric",
+      "minecraft": "26.3",
+      "status": "NATIVE_ADAPTER",
+      "adapterVersion": 1,
+      "knownIssues": ["Fluids with a custom FluidRenderHandler are tesselated in Java; overlay transparency follows FluidRenderingRegistry."],
+      "renderingFeatures": ["custom fluid render handlers", "fluid overlay transparency"],
+      "vulkan": "SUPPORTED",
+      "terrainHooksVerified": true,
+      "tests": [
+        {"date": "2026-11-01", "bloomVersion": "0.2.0", "backend": "vulkan", "result": "PASS", "notes": "158551 native fluid blocks, 0 differences (with fabric-api 0.165.0+26.3)"}
+      ]
+    },
+    {
+      "modId": "fabric-renderer-indigo",
+      "versions": "9.1.25",
+      "loader": "fabric",
+      "minecraft": "26.3",
+      "status": "NATIVE_ADAPTER",
+      "adapterVersion": 1,
+      "knownIssues": ["Only ambient-occlusion-mode=vanilla matches vanilla lighting (checked by Bloom at startup)."],
+      "renderingFeatures": ["Fabric Renderer API implementation"],
+      "vulkan": "SUPPORTED",
+      "terrainHooksVerified": true,
+      "tests": [
+        {"date": "2026-11-01", "bloomVersion": "0.2.0", "backend": "vulkan", "result": "PASS", "notes": "with fabric-api 0.165.0+26.3, see fabric-renderer-api-v1"}
+      ]
+    },
+    {
+      "modId": "fabric-api",
+      "versions": "0.165.0",
+      "loader": "fabric",
+      "minecraft": "26.3",
+      "status": "AUTOMATIC_ADAPTER",
+      "adapterVersion": 1,
+      "knownIssues": ["The rendering hooks are in the modules fabric-renderer-api-v1, fabric-rendering-v1, fabric-rendering-fluids-v1 and fabric-renderer-indigo."],
+      "renderingFeatures": [],
+      "vulkan": "SUPPORTED",
+      "terrainHooksVerified": false,
+      "tests": [
+        {"date": "2026-11-01", "bloomVersion": "0.2.0", "backend": "vulkan", "result": "PASS", "notes": "see fabric-renderer-api-v1"}
+      ]
+    },
+    {
+      "modId": "lithium",
+      "versions": "0.26.3",
+      "loader": "fabric",
+      "minecraft": "26.3",
+      "status": "AUTOMATIC_ADAPTER",
+      "adapterVersion": 0,
+      "knownIssues": [],
+      "renderingFeatures": [],
+      "vulkan": "SUPPORTED",
+      "terrainHooksVerified": false,
+      "tests": [
+        {"date": "2026-11-01", "bloomVersion": "0.2.0", "backend": "vulkan", "result": "PASS", "notes": "lithium mc26.3-0.26.3: no rendering hooks; 688 sections validated, 0 differences"}
+      ]
+    },
+    {
+      "modId": "sodium",
+      "versions": "*",
+      "loader": "fabric",
+      "minecraft": "26.3",
+      "status": "ENGINE_OFF",
+      "adapterVersion": 0,
+      "knownIssues": ["Replaces SectionRenderDispatcher and SectionCompiler: there is nothing for the Bloom mesher to hook. Its jar also contains Fabric API rendering modules."],
+      "renderingFeatures": ["chunk renderer replacement", "own terrain shaders"],
+      "vulkan": "SUPPORTED",
+      "terrainHooksVerified": false,
+      "tests": [
+        {"date": "2026-11-01", "bloomVersion": "0.2.0", "backend": "vulkan", "result": "PASS", "notes": "sodium mc26.3-0.9.3-beta.1 runs on Minecraft's Vulkan backend; Bloom off, diagnostics on"},
+        {"date": "2026-11-01", "bloomVersion": "0.2.0", "backend": "opengl", "result": "PASS", "notes": "same on OpenGL"}
+      ]
+    },
+    {
+      "modId": "iris",
+      "versions": "*",
+      "loader": "fabric",
+      "minecraft": "26.3",
+      "status": "ENGINE_OFF",
+      "adapterVersion": 0,
+      "knownIssues": [
+        "Requires Sodium (see sodium).",
+        "On Minecraft's Vulkan backend Iris loads but does not apply the shaderpack: the launcher selects OpenGL when Iris is installed."
+      ],
+      "renderingFeatures": ["shaderpacks", "shadow maps", "post processing"],
+      "vulkan": "UNSUPPORTED",
+      "terrainHooksVerified": false,
+      "tests": [
+        {"date": "2026-11-01", "bloomVersion": "0.2.0", "backend": "opengl", "result": "PASS", "notes": "iris 1.11.7+26.3 with Complementary Reimagined r5.9.3: shaderpack active, shadows visible"},
+        {"date": "2026-11-01", "bloomVersion": "0.2.0", "backend": "vulkan", "result": "FAIL", "notes": "same setup: game runs, shaderpack not applied, no error shown"}
+      ]
+    }
+  ]
+}

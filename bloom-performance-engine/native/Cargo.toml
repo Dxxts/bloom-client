@@ -8,6 +8,8 @@ members = [
     "crates/profiler",
     "crates/bloom-ffi",
     "crates/bloom-bench",
+    "crates/bloom-vulkan",
+    "crates/bloom-gpu-bench",
 ]
 
 [workspace.package]
@@ -22,6 +24,8 @@ chunk-mesher = { path = "crates/chunk-mesher" }
 culling = { path = "crates/culling" }
 world-processing = { path = "crates/world-processing" }
 profiler = { path = "crates/profiler" }
+bloom-bench = { path = "crates/bloom-bench" }
+bloom-vulkan = { path = "crates/bloom-vulkan" }
 
 [profile.release]
 opt-level = 3

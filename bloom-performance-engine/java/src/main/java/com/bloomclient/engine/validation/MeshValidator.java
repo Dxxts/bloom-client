@@ -26,13 +26,16 @@ import net.minecraft.core.SectionPos;
  * quad (as multisets of 112-byte quads, so draw order inside a layer does
  * not matter), plus the visibility sets.
  *
- * <p>Any difference disables the engine and is written to
+ * <p>A difference is ignored only if the light the native mesh read has
+ * changed since (light is read live, see {@code SectionMesher.lightChanged});
+ * any other difference disables the engine and is written to
  * {@code .bloom/validation-failure.json}: Bloom never keeps rendering a mesh
  * that differs from vanilla.
  */
 public final class MeshValidator {
 	private static final AtomicLong COUNTER = new AtomicLong();
 	private static final AtomicLong PASSED = new AtomicLong();
+	private static final AtomicLong SKIPPED = new AtomicLong();
 	private static final ThreadLocal<SectionBufferBuilderPack> PACKS = ThreadLocal.withInitial(SectionBufferBuilderPack::new);
 	private static final int QUAD_BYTES = Protocol.VERTEX_SIZE * 4;
 
@@ -41,6 +44,11 @@ public final class MeshValidator {
 
 	public static long passed() {
 		return PASSED.get();
+	}
+
+	/** Samples discarded because the world's light changed between the two compiles. */
+	public static long skipped() {
+		return SKIPPED.get();
 	}
 
 	public static void maybeValidate(SectionCompiler compiler, SectionPos pos, RenderSectionRegion region, VertexSorting sorting, SectionCompiler.Results nativeResults) {
@@ -57,6 +65,9 @@ public final class MeshValidator {
 			String difference = compare(nativeResults, vanilla);
 			if (difference == null) {
 				PASSED.incrementAndGet();
+			} else if (mesher.lightChanged(pos, region)) {
+				// Not a mesher error: the light engine updated the section in between.
+				SKIPPED.incrementAndGet();
 			} else {
 				Map<String, Object> report = new LinkedHashMap<>();
 				report.put("section", pos.toString());
@@ -120,8 +131,10 @@ public final class MeshValidator {
 		StringBuilder s = new StringBuilder("[");
 		for (int v = 0; v < 4; v++) {
 			int o = v * Protocol.VERTEX_SIZE;
-			s.append(String.format("(%.4f %.4f %.4f rgba=%08x uv=%.5f,%.5f light=%08x)", b.getFloat(o), b.getFloat(o + 4), b.getFloat(o + 8),
-					b.getInt(o + 12), b.getFloat(o + 16), b.getFloat(o + 20), b.getInt(o + 24)));
+			// Float.toString is the shortest exact representation: differences of one ulp stay visible.
+			s.append('(').append(b.getFloat(o)).append(' ').append(b.getFloat(o + 4)).append(' ').append(b.getFloat(o + 8))
+					.append(String.format(" rgba=%08x uv=", b.getInt(o + 12))).append(b.getFloat(o + 16)).append(',').append(b.getFloat(o + 20))
+					.append(String.format(" light=%08x)", b.getInt(o + 24)));
 		}
 		return s.append(']').toString();
 	}

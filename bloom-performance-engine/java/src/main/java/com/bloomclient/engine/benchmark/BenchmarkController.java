@@ -2,6 +2,8 @@ package com.bloomclient.engine.benchmark;
 
 import com.bloomclient.engine.BloomEngine;
 import com.bloomclient.engine.profiling.EngineProfiler;
+import com.bloomclient.engine.profiling.GpuFrameTimer;
+import com.bloomclient.engine.profiling.VramProbe;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
@@ -27,7 +29,7 @@ import net.minecraft.client.Minecraft;
  * without, with identical options, world and hardware.
  */
 public final class BenchmarkController {
-	private enum Phase { WAIT_WORLD, WARMUP, REMESH, ROTATE, DONE }
+	private enum Phase { WAIT_WORLD, WARMUP, REMESH, ROTATE, SCREENSHOT, DONE }
 
 	private static final String SCENE = System.getProperty("bloom.benchmark");
 	private static final long WARMUP_NS = Long.getLong("bloom.benchmark.warmup", 10) * 1_000_000_000L;
@@ -37,6 +39,8 @@ public final class BenchmarkController {
 	private static long phaseStart;
 	private static long remeshNanos;
 	private static float startYaw;
+	private static boolean screenshotTaken;
+	private static final boolean SCREENSHOT = Boolean.parseBoolean(System.getProperty("bloom.benchmark.screenshot", "true"));
 	private static final Map<String, Object> results = new LinkedHashMap<>();
 
 	private BenchmarkController() {
@@ -51,6 +55,7 @@ public final class BenchmarkController {
 		switch (phase) {
 			case WAIT_WORLD -> {
 				if (mc.level != null && mc.player != null) {
+					GpuFrameTimer.force(true);
 					next(Phase.WARMUP, now);
 				}
 			}
@@ -80,6 +85,24 @@ public final class BenchmarkController {
 				mc.player.setXRot(0.0F);
 				if (t >= 1.0F) {
 					finish(mc);
+					if (SCREENSHOT) {
+						// After the measurements: the F3 overlay costs frame time.
+						mc.debugEntries.setOverlayVisible(true);
+						next(Phase.SCREENSHOT, now);
+					} else {
+						phase = Phase.DONE;
+						mc.stop();
+					}
+				}
+			}
+			case SCREENSHOT -> {
+				if (!screenshotTaken && now - phaseStart > 1_500_000_000L) {
+					screenshotTaken = true;
+					net.minecraft.client.Screenshot.grab(mc.gameDirectory, "bloom-f3-" + engineLabel() + ".png", mc.gameRenderer.mainRenderTarget(), 1, message -> {});
+				}
+				if (now - phaseStart > 3_000_000_000L) {
+					phase = Phase.DONE;
+					mc.stop();
 				}
 			}
 			default -> {
@@ -92,8 +115,13 @@ public final class BenchmarkController {
 		phaseStart = now;
 	}
 
+	private static String engineLabel() {
+		String backend = com.mojang.blaze3d.systems.RenderSystem.getDevice().getDeviceInfo().backendName().toLowerCase(java.util.Locale.ROOT).contains("vulkan")
+				? "vulkan" : "opengl";
+		return (BloomEngine.active() ? "bloom-native" : "vanilla") + "-" + backend;
+	}
+
 	private static void finish(Minecraft mc) {
-		phase = Phase.DONE;
 		Map<String, Object> out = new LinkedHashMap<>();
 		out.put("scene", SCENE);
 		out.put("minecraft", SharedConstants.getCurrentVersion().name());
@@ -106,10 +134,14 @@ public final class BenchmarkController {
 		out.put("remeshAllSectionsMs", remeshNanos / 1e6);
 		out.putAll(results);
 		out.put("rotate", EngineProfiler.snapshot());
+		VramProbe.Sample vram = VramProbe.sample();
+		out.put("vram", java.util.Map.of("usedMiB", vram.usedMiB(), "totalMiB", vram.totalMiB(), "source", vram.source()));
+		out.put("gpuDevice", com.mojang.blaze3d.systems.RenderSystem.getDevice().getDeviceInfo().name());
+		out.put("gpuBackend", com.mojang.blaze3d.systems.RenderSystem.getDevice().getDeviceInfo().backendName());
+		out.put("nativeFluids", BloomEngine.config().nativeFluids);
+		out.put("mods", net.fabricmc.loader.api.FabricLoader.getInstance().getAllMods().stream().map(m -> m.getMetadata().getId() + "@" + m.getMetadata().getVersion().getFriendlyString()).filter(s -> !s.startsWith("java@") && !s.startsWith("minecraft@")).sorted().toList());
 		String stamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
-		String engine = BloomEngine.active() ? "bloom-native" : "vanilla";
-		EngineProfiler.write(BloomEngine.dataDir().resolve("benchmarks").resolve(SCENE + "-" + engine + "-" + stamp + ".json"), out);
+		EngineProfiler.write(BloomEngine.dataDir().resolve("benchmarks").resolve(SCENE + "-" + engineLabel() + "-" + stamp + ".json"), out);
 		BloomEngine.LOGGER.info("Bloom benchmark '{}' finished", SCENE);
-		mc.stop();
 	}
 }

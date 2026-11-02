@@ -24,7 +24,10 @@ public final class NativeBridge {
 
 	public static native void destroyContext(long ctx);
 
-	/** Writes {@link Protocol#LIGHT_MASK_BYTES}: the light positions the next {@link #meshSection} may read. */
+	/**
+	 * Writes the {@link Protocol#PLAN_SIZE}-byte plan: the light positions the
+	 * next {@link #meshSection} may read, then the fluid blocks Java must describe.
+	 */
 	public static native int planLight(long ctx, long snapshotAddr, int snapshotLen, long maskAddr);
 
 	/** Meshes one snapshot and writes {@link Protocol#RESULT_SIZE} bytes at {@code resultAddr}. */

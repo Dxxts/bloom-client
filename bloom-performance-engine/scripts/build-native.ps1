@@ -1,7 +1,9 @@
 <#
 .SYNOPSIS
-  Builds and tests the native engine, then the Fabric mod jar (which embeds
-  bloom_native.dll). Build output goes to D:\bloom-build (C: has little space).
+  Builds and tests the native engine (including the GPU test of the
+  experimental Vulkan backend, skipped without Vulkan), then the Fabric mod
+  jar (which embeds bloom_native.dll and the signed compatibility database)
+  and its JUnit tests. Build output goes to D:\bloom-build (C: has little space).
 #>
 $ErrorActionPreference = "Stop"
 $root = Split-Path $PSScriptRoot -Parent
@@ -13,7 +15,7 @@ Push-Location (Join-Path $root "native")
 try {
 	cargo test --workspace
 	if ($LASTEXITCODE -ne 0) { throw "cargo test failed" }
-	cargo build --release -p bloom-ffi -p bloom-bench
+	cargo build --release -p bloom-ffi -p bloom-bench -p bloom-gpu-bench
 	if ($LASTEXITCODE -ne 0) { throw "cargo build failed" }
 } finally { Pop-Location }
 

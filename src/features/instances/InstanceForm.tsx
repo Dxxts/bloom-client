@@ -7,7 +7,7 @@ import { useAsync } from "@/hooks/useAsync";
 import { api } from "@/services/api";
 import { useAppStore } from "@/stores/appStore";
 import { EngineIcon } from "@/components/EngineIcon";
-import type { EngineKind, Instance, InstanceInput, LoaderKind } from "@/types";
+import { DEFAULT_ENGINE_OPTIONS, type EngineKind, type EngineOptions, type Instance, type InstanceInput, type LoaderKind } from "@/types";
 import { cn, formatMemory } from "@/utils/format";
 import { INSTANCE_ICONS } from "./InstanceIcon";
 import { LoaderIcon } from "@/components/GameIcons";
@@ -19,6 +19,7 @@ export function emptyInput(versionId = ""): InstanceInput {
     loader: "vanilla",
     loaderVersion: null,
     engine: "java",
+    engineOptions: { ...DEFAULT_ENGINE_OPTIONS },
     javaPath: null,
     minRamMb: null,
     maxRamMb: null,
@@ -37,6 +38,7 @@ export function inputFromInstance(i: Instance): InstanceInput {
     loader: i.loader,
     loaderVersion: i.loaderVersion,
     engine: i.engine,
+    engineOptions: { ...DEFAULT_ENGINE_OPTIONS, ...i.engineOptions },
     javaPath: i.javaPath,
     minRamMb: i.minRamMb,
     maxRamMb: i.maxRamMb,
@@ -67,6 +69,8 @@ export function InstanceForm({
   const loaders = useAsync(() => api.listLoaders(), []);
   const engines = useAsync(() => api.listRenderEngines(), []);
   const set = <K extends keyof InstanceInput>(k: K, v: InstanceInput[K]) => onChange({ ...value, [k]: v });
+  const setEngine = <K extends keyof EngineOptions>(k: K, v: EngineOptions[K]) =>
+    onChange({ ...value, engineOptions: { ...value.engineOptions, [k]: v } });
 
   // Default to the latest release once versions are loaded.
   useEffect(() => {
@@ -227,6 +231,50 @@ export function InstanceForm({
         </div>
       </Field>
 
+      {value.engine === "rust" && (
+        <div className="space-y-3 rounded-xl border border-line bg-bg-2 p-4">
+          <div className="flex items-center gap-2 text-[13px] font-semibold text-text">
+            <EngineIcon engine="rust" size={15} />
+            {t("editor.bloomEngine")}
+          </div>
+          <EngineToggle
+            label={t("editor.bloomEnabled")}
+            hint={t("editor.bloomEnabledHint")}
+            checked={value.engineOptions.enabled}
+            onChange={(v) => setEngine("enabled", v)}
+          />
+          <EngineToggle
+            label={t("editor.bloomFluids")}
+            checked={value.engineOptions.nativeFluids}
+            disabled={!value.engineOptions.enabled}
+            onChange={(v) => setEngine("nativeFluids", v)}
+          />
+          <EngineToggle
+            label={t("editor.bloomValidate")}
+            hint={t("editor.bloomValidateHint")}
+            checked={value.engineOptions.validateEvery > 0}
+            disabled={!value.engineOptions.enabled}
+            onChange={(v) => setEngine("validateEvery", v ? 4 : 0)}
+          />
+          <EngineToggle
+            label={t("editor.bloomUnverified")}
+            hint={t("editor.bloomUnverifiedHint")}
+            checked={value.engineOptions.allowUnverified}
+            disabled={!value.engineOptions.enabled}
+            onChange={(v) => setEngine("allowUnverified", v)}
+          />
+          <Field label={t("editor.bloomGpu")} hint={t("editor.bloomGpuHint")}>
+            <Input
+              value={value.engineOptions.vulkanDevice}
+              maxLength={64}
+              spellCheck={false}
+              placeholder={t("editor.bloomGpuAuto")}
+              onChange={(e) => setEngine("vulkanDevice", e.target.value)}
+            />
+          </Field>
+        </div>
+      )}
+
       {showAdvanced && (
         <>
           <div className="space-y-3 rounded-xl border border-line bg-bg-2 p-4">
@@ -346,5 +394,29 @@ export function InstanceForm({
         </>
       )}
     </div>
+  );
+}
+
+function EngineToggle({
+  label,
+  hint,
+  checked,
+  disabled,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  checked: boolean;
+  disabled?: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <label className={cn("flex items-center justify-between gap-4", disabled && "opacity-50")}>
+      <span className="min-w-0">
+        <span className="block text-[13px] text-text">{label}</span>
+        {hint && <span className="block text-[12px] text-faint">{hint}</span>}
+      </span>
+      <Toggle checked={checked} disabled={disabled} label={label} onChange={onChange} />
+    </label>
   );
 }

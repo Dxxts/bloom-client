@@ -1,0 +1,24 @@
+{
+  "tool": "bloom-gpu-bench",
+  "device": "NVIDIA GeForce GTX 1660 SUPER",
+  "scene": "natural_terrain",
+  "sections": 1024,
+  "quads": 396166,
+  "vertices": 1584664,
+  "extent": [1920, 1080],
+  "present": false,
+  "vsync": false,
+  "validationLayer": false,
+  "validationWarnings": 0,
+  "validationErrors": 0,
+  "cpuMeshMs": 3245.7,
+  "uploadMs": 119.0,
+  "uploadedBytes": 44439484,
+  "bloomMemoryUsedMiB": 59,
+  "deviceLocalUsageMiB": 253,
+  "shaderCompileMs": 1.23,
+  "modes": [
+    {"mode": "Direct", "frames": 600, "drawCallsPerFrame": 511, "drawsPerFrame": 511, "gpuMsMean": 0.5478, "gpuMsP50": 0.4646, "gpuMsP99": 1.0338, "cpuRecordMsMean": 0.0294, "frameMsMean": 0.5572},
+    {"mode": "MultiDrawIndirect", "frames": 600, "drawCallsPerFrame": 1, "drawsPerFrame": 511, "gpuMsMean": 0.5011, "gpuMsP50": 0.4499, "gpuMsP99": 0.8159, "cpuRecordMsMean": 0.0128, "frameMsMean": 0.5337}
+  ]
+}

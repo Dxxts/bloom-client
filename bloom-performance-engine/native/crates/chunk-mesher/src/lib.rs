@@ -8,18 +8,23 @@
 //!
 //! Blocks the mesher cannot reproduce exactly are never approximated: they
 //! are "demoted" and Java tesselates them with the vanilla renderer.
+//!
+//! Fluids (`FluidRenderer`) are meshed natively too when the snapshot asks
+//! for it; see [`fluid`].
 
 pub mod ao;
+mod fluid;
 pub mod snapshot;
 
 use bloom_core::model::Model;
 use bloom_core::protocol::{
-    face_class, skip_rule, state_flags, LAYER_COUNT, LIGHT_DIM, LIGHT_MIN, MAX_TINTS, MODEL_JAVA, MODEL_NONE, SECTION_VOLUME, VERTEX_SIZE,
+    face_class, skip_rule, state_flags, DEMOTED_FLUID_BIT, LAYER_COUNT, LIGHT_DIM, LIGHT_MIN, MAX_TINTS, MODEL_JAVA, MODEL_NONE,
+    PLAN_FLUID_NEEDS_FLOW, SECTION_VOLUME, VERTEX_SIZE,
 };
 use bloom_core::state::{StateInfo, StateTable};
 use bloom_core::{color, light, Direction};
 use culling::visgraph::VisGraph;
-pub use snapshot::{Snapshot, SnapshotBuilder, SnapshotError};
+pub use snapshot::{encode_fluid_entry, FluidEntry, Snapshot, SnapshotBuilder, SnapshotError};
 
 /// Read access to registered models (ids start at 1).
 pub trait ModelSource {
@@ -46,6 +51,8 @@ pub struct MeshStats {
     pub demoted_blocks: u32,
     pub quads: u32,
     pub culled_faces: u32,
+    pub native_fluids: u32,
+    pub demoted_fluids: u32,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -57,15 +64,20 @@ pub enum MeshError {
 /// Per-thread meshing context. Buffers keep their capacity between calls.
 pub struct Mesher {
     pub layers: [Vec<u8>; LAYER_COUNT],
+    /// Block indices handed back to Java; [`DEMOTED_FLUID_BIT`] marks a fluid.
     pub demoted: Vec<u16>,
     pub visibility: u64,
     pub stats: MeshStats,
     vis_graph: VisGraph,
     tint_slot: Box<[u16; SECTION_VOLUME]>,
     offset_slot: Box<[u16; SECTION_VOLUME]>,
+    fluid_slot: Box<[u16; SECTION_VOLUME]>,
+    /// Fluid blocks Java must describe (tint, flow), from [`Mesher::plan_light`].
+    fluid_requests: Vec<u16>,
     /// Light positions Java filled in, from [`Mesher::plan_light`]. While
     /// active, reading any other position demotes the block.
-    light_mask: Box<[u8; LIGHT_MASK_BYTES]>,
+    /// `None` only while [`Mesher::mesh`] borrows it (taken, not reallocated).
+    light_mask: Option<Box<[u8; LIGHT_MASK_BYTES]>>,
     light_mask_active: bool,
 }
 
@@ -98,9 +110,18 @@ impl Mesher {
             vis_graph: VisGraph::new(),
             tint_slot: Box::new([NO_SLOT; SECTION_VOLUME]),
             offset_slot: Box::new([NO_SLOT; SECTION_VOLUME]),
-            light_mask: Box::new([0; LIGHT_MASK_BYTES]),
+            fluid_slot: Box::new([NO_SLOT; SECTION_VOLUME]),
+            fluid_requests: Vec::new(),
+            light_mask: Some(Box::new([0; LIGHT_MASK_BYTES])),
             light_mask_active: false,
         }
+    }
+
+    /// Fluid blocks the last [`Mesher::plan_light`] needs a [`FluidEntry`]
+    /// for: block index, plus [`PLAN_FLUID_NEEDS_FLOW`] when the top face is
+    /// drawn and the flow is needed.
+    pub fn fluid_requests(&self) -> &[u16] {
+        &self.fluid_requests
     }
 
     /// Vertex count of `layer` in the last result.
@@ -117,7 +138,8 @@ impl Mesher {
         if snap.epoch != states.epoch {
             return Err(MeshError::StaleEpoch);
         }
-        self.light_mask.fill(0);
+        let light_mask = self.light_mask.as_mut().expect("light mask in use");
+        light_mask.fill(0);
         let ctx = Ctx { snap: &snap, states, ao_enabled: false, cutout_leaves: snap.cutout_leaves(), light_mask: None };
         for index in 0..SECTION_VOLUME {
             let model_id = snap.model(index);
@@ -137,14 +159,35 @@ impl Mesher {
                     for dz in -1..=1 {
                         for dx in -1..=1 {
                             let i = light_index(pos[0] + dx, pos[1] + dy, pos[2] + dz);
-                            self.light_mask[i / 8] |= 1 << (i % 8);
+                            light_mask[i / 8] |= 1 << (i % 8);
                         }
                     }
                 }
             }
         }
+        self.fluid_requests.clear();
+        if snap.native_fluids() {
+            for index in 0..SECTION_VOLUME {
+                let pos = [(index & 15) as i32, (index >> 8) as i32, ((index >> 4) & 15) as i32];
+                let state = states.get(snap.state_id(pos[0], pos[1], pos[2]));
+                if !state.has_native_fluid() {
+                    continue;
+                }
+                // Blocks that will be demoted need nothing from Java.
+                let Ok(Some(shape)) = ctx.fluid_shape(pos, state) else { continue };
+                if !shape.draws_anything() {
+                    continue;
+                }
+                let flow = if shape.top.is_some() { PLAN_FLUID_NEEDS_FLOW } else { 0 };
+                self.fluid_requests.push(index as u16 | flow);
+                for dy in -1..=1 {
+                    let i = light_index(pos[0], pos[1] + dy, pos[2]);
+                    light_mask[i / 8] |= 1 << (i % 8);
+                }
+            }
+        }
         self.light_mask_active = true;
-        Ok(&self.light_mask[..])
+        Ok(&self.light_mask.as_ref().expect("light mask in use")[..])
     }
 
     pub fn mesh<M: ModelSource + ?Sized>(&mut self, bytes: &[u8], states: &StateTable, models: &M) -> Result<(), MeshError> {
@@ -176,8 +219,18 @@ impl Mesher {
             }
             self.offset_slot[index] = i as u16;
         }
+        for i in 0..snap.fluid_count {
+            let entry = snap.fluid_entry(i).ok_or(MeshError::Snapshot(SnapshotError::Truncated))?;
+            if entry.index >= SECTION_VOLUME {
+                self.clear_slots(&snap, snap.tint_count, snap.offset_count);
+                self.clear_fluid_slots(&snap, i);
+                return Err(MeshError::Snapshot(SnapshotError::BadIndex));
+            }
+            self.fluid_slot[entry.index] = i as u16;
+        }
+        let native_fluids = snap.native_fluids();
 
-        let mask = std::mem::replace(&mut self.light_mask, Box::new([0; LIGHT_MASK_BYTES]));
+        let mask = self.light_mask.take().expect("light mask in use");
         let ctx = Ctx {
             snap: &snap,
             states,
@@ -196,6 +249,10 @@ impl Mesher {
                     }
                     if state.has(state_flags::SOLID_RENDER) {
                         self.vis_graph.set_opaque(index);
+                    }
+                    // Vanilla order: the fluid, then the block model.
+                    if native_fluids && state.has_native_fluid() {
+                        self.mesh_fluid(&ctx, [x as i32, y as i32, z as i32], index, state);
                     }
                     let model_id = snap.model(index);
                     if model_id == MODEL_NONE || model_id == MODEL_JAVA {
@@ -221,8 +278,46 @@ impl Mesher {
         }
         self.visibility = self.vis_graph.resolve();
         self.clear_slots(&snap, snap.tint_count, snap.offset_count);
-        self.light_mask = mask;
+        self.clear_fluid_slots(&snap, snap.fluid_count);
+        self.light_mask = Some(mask);
         Ok(())
+    }
+
+    fn mesh_fluid(&mut self, ctx: &Ctx<'_>, pos: [i32; 3], index: usize, state: &StateInfo) {
+        let result = ctx.fluid_shape(pos, state).and_then(|shape| {
+            let Some(shape) = shape else { return Ok(0) };
+            if !shape.draws_anything() {
+                return Ok(0);
+            }
+            let entry = match self.fluid_slot[index] {
+                NO_SLOT => return Err(Demote),
+                slot => ctx.snap.fluid_entry(slot as usize).ok_or(Demote)?,
+            };
+            if shape.top.is_some() && !entry.flow_known {
+                return Err(Demote);
+            }
+            ctx.emit_fluid(pos, &shape, &entry, &mut self.layers)
+        });
+        match result {
+            Ok(quads) => {
+                self.stats.native_fluids += 1;
+                self.stats.quads += quads;
+            }
+            Err(Demote) => {
+                self.demoted.push(index as u16 | DEMOTED_FLUID_BIT);
+                self.stats.demoted_fluids += 1;
+            }
+        }
+    }
+
+    fn clear_fluid_slots(&mut self, snap: &Snapshot<'_>, count: usize) {
+        for i in 0..count {
+            if let Some(entry) = snap.fluid_entry(i) {
+                if entry.index < SECTION_VOLUME {
+                    self.fluid_slot[entry.index] = NO_SLOT;
+                }
+            }
+        }
     }
 
     fn clear_slots(&mut self, snap: &Snapshot<'_>, tints: usize, offsets: usize) {
@@ -258,12 +353,12 @@ impl Mesher {
         if tints.0 > MAX_TINTS {
             return Err(Demote);
         }
-        let offset = match self.offset_slot[index] {
-            NO_SLOT => [0.0; 3],
+        // Blocks with an offset function carry their origin, computed by Java in
+        // the convention of the active renderer (vanilla: `x + (float) offset.x`).
+        let origin = match self.offset_slot[index] {
+            NO_SLOT => [pos[0] as f32, pos[1] as f32, pos[2] as f32],
             slot => ctx.snap.offset_entry(slot as usize).ok_or(Demote)?.1,
         };
-        // `x + (float) offset.x`, as vanilla passes it to tesselateAmbientOcclusion/Flat.
-        let origin = [pos[0] as f32 + offset[0], pos[1] as f32 + offset[1], pos[2] as f32 + offset[2]];
         let use_ao = ctx.ao_enabled && state.light_emission == 0 && model.use_ao;
         let force_solid = !ctx.cutout_leaves && state.has(state_flags::LEAVES);
 
@@ -534,3 +629,5 @@ impl<'a> Ctx<'a> {
 
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod fluid_tests;

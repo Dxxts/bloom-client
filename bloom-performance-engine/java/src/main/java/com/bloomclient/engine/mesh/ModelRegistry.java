@@ -4,6 +4,7 @@ import com.bloomclient.engine.BloomEngine;
 import com.bloomclient.engine.bridge.NativeBridge;
 import com.bloomclient.engine.bridge.NativeLibrary;
 import com.bloomclient.engine.bridge.Protocol;
+import com.bloomclient.engine.compatibility.FabricApiAdapter;
 import com.bloomclient.engine.compatibility.BloomRenderAdapters;
 import java.util.Arrays;
 import java.util.List;
@@ -58,11 +59,19 @@ public final class ModelRegistry {
 			return existing;
 		}
 		int quadCount = 0;
+		boolean shadeOverride = false;
 		for (BlockStateModelPart part : parts) {
 			for (Direction d : Direction.values()) {
 				quadCount += part.getQuads(d).size();
+				shadeOverride |= part.getQuads(d).stream().anyMatch(q -> q.materialInfo().shadeDirectionOverride() != null);
 			}
 			quadCount += part.getQuads(null).size();
+			shadeOverride |= part.getQuads(null).stream().anyMatch(q -> q.materialInfo().shadeDirectionOverride() != null);
+		}
+		if (shadeOverride && FabricApiAdapter.indigo() != FabricApiAdapter.Indigo.ABSENT) {
+			// Indigo's vanilla lighting drops the shade direction override: such models stay with Indigo.
+			ids.put(key, Protocol.MODEL_JAVA);
+			return Protocol.MODEL_JAVA;
 		}
 		int size = Protocol.MODEL_HEADER_SIZE + quadCount * Protocol.QUAD_RECORD_SIZE;
 		long buf = MemoryUtil.nmemCalloc(1, size);

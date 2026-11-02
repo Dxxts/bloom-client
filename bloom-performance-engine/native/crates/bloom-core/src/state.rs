@@ -2,8 +2,8 @@
 //! block state id (`Block.BLOCK_STATE_REGISTRY`).
 
 use crate::protocol::{
-    face_class, state_flags, Reader, NO_SHAPE, SHAPE_PAIRS_MAGIC, STATE_RECORD_SIZE, STATE_TABLE_MAGIC,
-    TABLE_HEADER_SIZE,
+    face_class, fluid_group, state_flags, Reader, FLUID_MODELS_MAGIC, FLUID_MODEL_HAS_OVERLAY, FLUID_MODEL_RECORD_SIZE,
+    FLUID_MODEL_TINTED, NO_SHAPE, SHAPE_PAIRS_MAGIC, STATE_RECORD_SIZE, STATE_TABLE_MAGIC, TABLE_HEADER_SIZE,
 };
 use crate::Direction;
 
@@ -17,6 +17,12 @@ pub struct StateInfo {
     /// Two bits per direction, see [`face_class`].
     pub face_classes: u16,
     pub face_shapes: [u16; 6],
+    /// See [`fluid_group`]: equal groups mean `Fluid.isSame`.
+    pub fluid_group: u8,
+    /// Index into [`StateTable::fluid_models`].
+    pub fluid_model: u8,
+    /// `FluidState.getAmount()`; the own height is `amount / 9`.
+    pub fluid_amount: u8,
 }
 
 impl StateInfo {
@@ -30,6 +36,9 @@ impl StateInfo {
         skip_rule: 0,
         face_classes: 0,
         face_shapes: [NO_SHAPE; 6],
+        fluid_group: fluid_group::UNVERIFIED,
+        fluid_model: 0,
+        fluid_amount: 0,
     };
 
     #[inline]
@@ -41,6 +50,47 @@ impl StateInfo {
     pub fn face_class(&self, d: Direction) -> u8 {
         ((self.face_classes >> (d.ordinal() * 2)) & 3) as u8
     }
+
+    /// The state holds a fluid Bloom may tesselate.
+    #[inline]
+    pub fn has_native_fluid(&self) -> bool {
+        self.fluid_group != fluid_group::NONE && self.fluid_group != fluid_group::UNVERIFIED
+    }
+}
+
+/// UV bounds of a `TextureAtlasSprite`.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct Sprite {
+    pub u0: f32,
+    pub u1: f32,
+    pub v0: f32,
+    pub v1: f32,
+}
+
+impl Sprite {
+    /// `TextureAtlasSprite.getU(offset)`.
+    #[inline]
+    pub fn u(&self, offset: f32) -> f32 {
+        let diff = self.u1 - self.u0;
+        self.u0 + diff * offset
+    }
+
+    /// `TextureAtlasSprite.getV(offset)`.
+    #[inline]
+    pub fn v(&self, offset: f32) -> f32 {
+        let diff = self.v1 - self.v0;
+        self.v0 + diff * offset
+    }
+}
+
+/// `FluidModel`: layer, sprites and whether a tint source exists.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct FluidModel {
+    pub layer: u8,
+    pub tinted: bool,
+    pub still: Sprite,
+    pub flowing: Sprite,
+    pub overlay: Option<Sprite>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -110,11 +160,22 @@ pub struct StateTable {
     pub epoch: u32,
     states: Vec<StateInfo>,
     pub shape_pairs: ShapePairs,
+    pub fluid_models: Vec<FluidModel>,
 }
 
 impl StateTable {
     pub fn new(epoch: u32, states: Vec<StateInfo>, shape_pairs: ShapePairs) -> Self {
-        Self { epoch, states, shape_pairs }
+        Self { epoch, states, shape_pairs, fluid_models: Vec::new() }
+    }
+
+    pub fn with_fluid_models(mut self, models: Vec<FluidModel>) -> Self {
+        self.fluid_models = models;
+        self
+    }
+
+    #[inline]
+    pub fn fluid_model(&self, index: u8) -> Option<&FluidModel> {
+        self.fluid_models.get(index as usize)
     }
 
     pub fn parse(state_bytes: &[u8], pair_bytes: &[u8]) -> Result<Self, TableError> {
@@ -147,6 +208,9 @@ impl StateTable {
                 skip_rule: r.u8(o + 13).ok_or(TableError::Truncated)?,
                 face_classes: r.u16(o + 14).ok_or(TableError::Truncated)?,
                 face_shapes,
+                fluid_group: r.u8(o + 28).ok_or(TableError::Truncated)?,
+                fluid_model: r.u8(o + 29).ok_or(TableError::Truncated)?,
+                fluid_amount: r.u8(o + 30).ok_or(TableError::Truncated)?,
             };
             for d in Direction::ALL {
                 let class = info.face_class(d);
@@ -158,7 +222,8 @@ impl StateTable {
             }
             states.push(info);
         }
-        Ok(Self { epoch, states, shape_pairs })
+        let fluid_models = parse_fluid_models(&r, needed)?;
+        Ok(Self { epoch, states, shape_pairs, fluid_models })
     }
 
     #[inline]
@@ -175,8 +240,51 @@ impl StateTable {
     }
 }
 
+/// Optional fluid model section after the state records: magic, count, records.
+fn parse_fluid_models(r: &Reader<'_>, at: usize) -> Result<Vec<FluidModel>, TableError> {
+    if r.len() == at {
+        return Ok(Vec::new());
+    }
+    if r.u32(at) != Some(FLUID_MODELS_MAGIC) {
+        return Err(TableError::BadHeader);
+    }
+    let count = r.u32(at + 4).ok_or(TableError::Truncated)? as usize;
+    if count > 254 {
+        return Err(TableError::BadHeader);
+    }
+    let sprite = |o: usize| -> Result<Sprite, TableError> {
+        Ok(Sprite {
+            u0: r.f32(o).ok_or(TableError::Truncated)?,
+            u1: r.f32(o + 4).ok_or(TableError::Truncated)?,
+            v0: r.f32(o + 8).ok_or(TableError::Truncated)?,
+            v1: r.f32(o + 12).ok_or(TableError::Truncated)?,
+        })
+    };
+    let mut models = Vec::with_capacity(count);
+    for i in 0..count {
+        let o = at + 8 + i * FLUID_MODEL_RECORD_SIZE;
+        let layer = r.u8(o).ok_or(TableError::Truncated)?;
+        let flags = r.u8(o + 1).ok_or(TableError::Truncated)?;
+        if layer as usize >= crate::protocol::LAYER_COUNT {
+            return Err(TableError::BadHeader);
+        }
+        models.push(FluidModel {
+            layer,
+            tinted: flags & FLUID_MODEL_TINTED != 0,
+            still: sprite(o + 4)?,
+            flowing: sprite(o + 20)?,
+            overlay: if flags & FLUID_MODEL_HAS_OVERLAY != 0 { Some(sprite(o + 36)?) } else { None },
+        });
+    }
+    Ok(models)
+}
+
 /// Encodes a state table in the wire format (used by tests and benchmarks).
 pub fn encode_state_table(epoch: u32, states: &[StateInfo]) -> Vec<u8> {
+    encode_state_table_with_fluids(epoch, states, &[])
+}
+
+pub fn encode_state_table_with_fluids(epoch: u32, states: &[StateInfo], fluids: &[FluidModel]) -> Vec<u8> {
     let mut w = crate::protocol::Writer::with_len(TABLE_HEADER_SIZE + states.len() * STATE_RECORD_SIZE);
     w.put_u32(0, STATE_TABLE_MAGIC);
     w.put_u32(4, crate::protocol::PROTOCOL_VERSION);
@@ -192,6 +300,34 @@ pub fn encode_state_table(epoch: u32, states: &[StateInfo]) -> Vec<u8> {
         w.put_u16(o + 14, s.face_classes);
         for d in 0..6 {
             w.put_u16(o + 16 + d * 2, s.face_shapes[d]);
+        }
+        w.put_u8(o + 28, s.fluid_group);
+        w.put_u8(o + 29, s.fluid_model);
+        w.put_u8(o + 30, s.fluid_amount);
+    }
+    if !fluids.is_empty() {
+        let at = w.bytes.len();
+        w.bytes.resize(at + 8 + fluids.len() * FLUID_MODEL_RECORD_SIZE, 0);
+        w.put_u32(at, FLUID_MODELS_MAGIC);
+        w.put_u32(at + 4, fluids.len() as u32);
+        for (i, m) in fluids.iter().enumerate() {
+            let o = at + 8 + i * FLUID_MODEL_RECORD_SIZE;
+            let mut flags = 0;
+            if m.tinted {
+                flags |= FLUID_MODEL_TINTED;
+            }
+            if m.overlay.is_some() {
+                flags |= FLUID_MODEL_HAS_OVERLAY;
+            }
+            w.put_u8(o, m.layer);
+            w.put_u8(o + 1, flags);
+            for (k, sp) in [m.still, m.flowing, m.overlay.unwrap_or_default()].iter().enumerate() {
+                let b = o + 4 + k * 16;
+                w.put_f32(b, sp.u0);
+                w.put_f32(b + 4, sp.u1);
+                w.put_f32(b + 8, sp.v0);
+                w.put_f32(b + 12, sp.v1);
+            }
         }
     }
     w.bytes
@@ -211,6 +347,9 @@ mod tests {
             skip_rule: 0,
             face_classes: 0b01_01_01_01_01_01,
             face_shapes: [NO_SHAPE; 6],
+            fluid_group: fluid_group::NONE,
+            fluid_model: 0,
+            fluid_amount: 0,
         };
         let bytes = encode_state_table(7, &[StateInfo { flags: state_flags::AIR, ..stone }, stone]);
         let table = StateTable::parse(&bytes, &[]).unwrap();
@@ -219,6 +358,39 @@ mod tests {
         assert_eq!(table.get(1).face_class(Direction::East), face_class::BLOCK);
         assert!(table.get(99).has(state_flags::DYNAMIC));
         assert_eq!(StateTable::parse(&bytes[..20], &[]).err(), Some(TableError::Truncated));
+    }
+
+    #[test]
+    fn fluid_models_roundtrip() {
+        let water = StateInfo {
+            flags: 0,
+            block_id: 2,
+            shade_brightness: 1.0,
+            light_emission: 0,
+            skip_rule: 0,
+            face_classes: 0,
+            face_shapes: [NO_SHAPE; 6],
+            fluid_group: 1,
+            fluid_model: 0,
+            fluid_amount: 8,
+        };
+        let model = FluidModel {
+            layer: 2,
+            tinted: true,
+            still: Sprite { u0: 0.1, u1: 0.2, v0: 0.3, v1: 0.4 },
+            flowing: Sprite { u0: 0.5, u1: 0.6, v0: 0.7, v1: 0.8 },
+            overlay: Some(Sprite { u0: 0.0, u1: 0.25, v0: 0.5, v1: 0.75 }),
+        };
+        let bytes = encode_state_table_with_fluids(3, &[water], &[model]);
+        let table = StateTable::parse(&bytes, &[]).unwrap();
+        assert_eq!(*table.get(0), water);
+        assert!(table.get(0).has_native_fluid());
+        assert_eq!(table.fluid_model(0), Some(&model));
+        assert_eq!(table.fluid_model(1), None);
+        let mut corrupt = bytes.clone();
+        let at = bytes.len() - 8 - FLUID_MODEL_RECORD_SIZE;
+        corrupt[at] ^= 0xFF;
+        assert_eq!(StateTable::parse(&corrupt, &[]).err(), Some(TableError::BadHeader));
     }
 
     #[test]

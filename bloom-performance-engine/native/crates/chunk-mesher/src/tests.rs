@@ -24,6 +24,9 @@ fn table() -> StateTable {
         skip_rule: skip_rule::NONE,
         face_classes: all_faces(face_class::EMPTY),
         face_shapes: [NO_SHAPE; 6],
+        fluid_group: 0,
+        fluid_model: 0,
+        fluid_amount: 0,
     };
     let full = StateInfo {
         flags: f::SOLID_RENDER | f::COLLISION_FULL_BLOCK,
@@ -251,7 +254,8 @@ fn dynamic_neighbours_demote_and_truncate() {
 #[test]
 fn offsets_move_vertices() {
     let mut s = Scene::new(&[([8, 8, 8], STONE)]);
-    s.offsets = vec![(idx([8, 8, 8]), [0.25, 0.0, -0.125])];
+    // Entries carry the origin: block position plus offset.
+    s.offsets = vec![(idx([8, 8, 8]), [8.25, 8.0, 7.875])];
     let vs = vertices(&s.mesh().layers[0]);
     assert!(vs.iter().all(|v| (8.25..=9.25).contains(&v.pos[0]) && (7.875..=8.875).contains(&v.pos[2])));
 }

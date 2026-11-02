@@ -1,0 +1,212 @@
+{
+  "scene": "world",
+  "minecraft": "26.3",
+  "engine": "OFF",
+  "engineReason": "compatibility: fabric-rendering-v1 (unverified hooks on net.minecraft.client.renderer.block.ModelBlockRenderer; the Fabric API adapter has not been validated with this version), fabric-rendering-fluids-v1 (unverified hooks on net.minecraft.client.renderer.block.FluidRenderer, net.minecraft.client.renderer.block.FluidStateModelSet; the Fabric API adapter has not been validated with this version), sodium (compatibility database (adapter v0)), fabric-renderer-api-v1 (unverified hooks on net.minecraft.client.renderer.block.BlockStateModelSet, net.minecraft.client.renderer.chunk.SectionCompiler; the Fabric API adapter has not been validated with this version), iris (compatibility database (adapter v0))",
+  "renderDistance": 16,
+  "graphicsBackendOption": "VULKAN",
+  "cpuThreads": 12,
+  "maxHeapMb": 4080,
+  "remeshAllSectionsMs": 705.8484,
+  "remeshTimedOut": false,
+  "remesh": {
+    "engineStatus": "OFF",
+    "engineReason": "compatibility: fabric-rendering-v1 (unverified hooks on net.minecraft.client.renderer.block.ModelBlockRenderer; the Fabric API adapter has not been validated with this version), fabric-rendering-fluids-v1 (unverified hooks on net.minecraft.client.renderer.block.FluidRenderer, net.minecraft.client.renderer.block.FluidStateModelSet; the Fabric API adapter has not been validated with this version), sodium (compatibility database (adapter v0)), fabric-renderer-api-v1 (unverified hooks on net.minecraft.client.renderer.block.BlockStateModelSet, net.minecraft.client.renderer.chunk.SectionCompiler; the Fabric API adapter has not been validated with this version), iris (compatibility database (adapter v0))",
+    "compileNativeMs": {
+      "count": 0
+    },
+    "compileVanillaMs": {
+      "count": 0
+    },
+    "snapshotMs": {
+      "count": 0
+    },
+    "nativeMeshMs": {
+      "count": 0
+    },
+    "nativeBlocks": 0,
+    "demotedBlocks": 0,
+    "nativeFluids": 0,
+    "demotedFluids": 0,
+    "frames": {
+      "count": 77,
+      "avgFps": 118.088976823428,
+      "onePercentLowFps": 86.69117137110756,
+      "frameTimeMs": {
+        "max": 11.5352,
+        "p50": 8.3403,
+        "p99": 11.5352
+      },
+      "mainThreadWorkMsP50": 8.2807,
+      "stutters": 0
+    },
+    "render": {
+      "frames": 78,
+      "stagesPerFrame": {
+        "extract_entities": {
+          "maxMs": 0.8017,
+          "meanMs": 0.5332064102564102
+        },
+        "extract_block_entities": {
+          "maxMs": 0.0,
+          "meanMs": 0.0
+        },
+        "extract_particles": {
+          "maxMs": 0.1323,
+          "meanMs": 0.09143205128205129
+        },
+        "submit_entities": {
+          "maxMs": 0.2292,
+          "meanMs": 0.0816153846153846
+        },
+        "submit_block_entities": {
+          "maxMs": 0.0215,
+          "meanMs": 0.0031679487179487177
+        },
+        "submit_particles": {
+          "maxMs": 0.0167,
+          "meanMs": 0.011175641025641026
+        },
+        "prepare_features": {
+          "maxMs": 0.5627,
+          "meanMs": 0.3409038461538461
+        },
+        "execute_frame_graph": {
+          "maxMs": 3.8134,
+          "meanMs": 0.5518974358974359
+        }
+      },
+      "drawCallsPerFrame": 46.03846153846154,
+      "drawsPerFrame": 418.44871794871796,
+      "entitiesPerFrame": 9.282051282051283,
+      "blockEntitiesPerFrame": 0.0
+    },
+    "gpuFrame": {
+      "samples": 78,
+      "meanMs": 9.032074666666668,
+      "maxMs": 58.425888
+    },
+    "validatedSections": 0,
+    "validationSkippedLightChanged": 0,
+    "heapUsedMb": 1561,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.6521862939247212,
+    "native": {
+      "unavailable": "UnsatisfiedLinkError"
+    }
+  },
+  "rotate": {
+    "engineStatus": "OFF",
+    "engineReason": "compatibility: fabric-rendering-v1 (unverified hooks on net.minecraft.client.renderer.block.ModelBlockRenderer; the Fabric API adapter has not been validated with this version), fabric-rendering-fluids-v1 (unverified hooks on net.minecraft.client.renderer.block.FluidRenderer, net.minecraft.client.renderer.block.FluidStateModelSet; the Fabric API adapter has not been validated with this version), sodium (compatibility database (adapter v0)), fabric-renderer-api-v1 (unverified hooks on net.minecraft.client.renderer.block.BlockStateModelSet, net.minecraft.client.renderer.chunk.SectionCompiler; the Fabric API adapter has not been validated with this version), iris (compatibility database (adapter v0))",
+    "compileNativeMs": {
+      "count": 0
+    },
+    "compileVanillaMs": {
+      "count": 0
+    },
+    "snapshotMs": {
+      "count": 0
+    },
+    "nativeMeshMs": {
+      "count": 0
+    },
+    "nativeBlocks": 0,
+    "demotedBlocks": 0,
+    "nativeFluids": 0,
+    "demotedFluids": 0,
+    "frames": {
+      "count": 1037,
+      "avgFps": 104.48946492778867,
+      "onePercentLowFps": 14.899084034111752,
+      "frameTimeMs": {
+        "max": 127.7314,
+        "p50": 8.3538,
+        "p99": 34.7686
+      },
+      "mainThreadWorkMsP50": 8.2781,
+      "stutters": 11
+    },
+    "render": {
+      "frames": 1038,
+      "stagesPerFrame": {
+        "extract_entities": {
+          "maxMs": 11.8196,
+          "meanMs": 0.466526204238921
+        },
+        "extract_block_entities": {
+          "maxMs": 0.0,
+          "meanMs": 0.0
+        },
+        "extract_particles": {
+          "maxMs": 1.8892,
+          "meanMs": 0.09882186897880539
+        },
+        "submit_entities": {
+          "maxMs": 2.8929,
+          "meanMs": 0.12890346820809248
+        },
+        "submit_block_entities": {
+          "maxMs": 0.0274,
+          "meanMs": 0.0010707129094412332
+        },
+        "submit_particles": {
+          "maxMs": 2.4433,
+          "meanMs": 0.008074277456647398
+        },
+        "prepare_features": {
+          "maxMs": 9.1663,
+          "meanMs": 0.39990269749518303
+        },
+        "execute_frame_graph": {
+          "maxMs": 9.3405,
+          "meanMs": 0.5784497109826591
+        }
+      },
+      "drawCallsPerFrame": 77.00963391136801,
+      "drawsPerFrame": 1476.1579961464354,
+      "entitiesPerFrame": 8.567437379576107,
+      "blockEntitiesPerFrame": 0.0
+    },
+    "gpuFrame": {
+      "samples": 1038,
+      "meanMs": 9.63574625048168,
+      "maxMs": 119.146656
+    },
+    "validatedSections": 0,
+    "validationSkippedLightChanged": 0,
+    "heapUsedMb": 960,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.1360930751173361,
+    "native": {
+      "unavailable": "UnsatisfiedLinkError"
+    }
+  },
+  "vram": {
+    "totalMiB": 4943,
+    "usedMiB": 417,
+    "source": "Vulkan VMA budget (device-local heaps)"
+  },
+  "gpuDevice": "NVIDIA GeForce GTX 1660 SUPER",
+  "gpuBackend": "Vulkan",
+  "nativeFluids": true,
+  "mods": [
+    "bloom-engine@0.1.0",
+    "fabric-api-base@2.0.6+fcdff87f02",
+    "fabric-block-getter-api-v2@2.0.9+3434d6d902",
+    "fabric-key-mapping-api-v1@2.0.8+3434d6d902",
+    "fabric-lifecycle-events-v1@4.1.9+ffef5f6702",
+    "fabric-renderer-api-v1@17.0.14+2ce735b802",
+    "fabric-rendering-fluids-v1@6.0.6+3434d6d902",
+    "fabric-rendering-v1@27.0.14+901a437c02",
+    "fabric-resource-loader-v0@3.3.26+4fc5413f02",
+    "fabric-resource-loader-v1@3.0.4+fcdff87f02",
+    "fabric-transitive-access-wideners-v1@8.1.16+52268a0e02",
+    "fabricloader@0.20.1",
+    "io_github_douira_glsl-transformer@3.0.0-pre3",
+    "iris@1.11.7+mc26.3",
+    "mixinextras@0.5.5",
+    "org_anarres_jcpp@1.4.14",
+    "org_antlr_antlr4-runtime@4.13.1",
+    "sodium@0.9.3-beta.1+mc26.3"
+  ]
+}

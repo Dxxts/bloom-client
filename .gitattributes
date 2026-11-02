@@ -1,0 +1,2 @@
+# Signed files: bytes must never change (end-of-line conversion would break the signature).
+bloom-performance-engine/compat-db/** -text

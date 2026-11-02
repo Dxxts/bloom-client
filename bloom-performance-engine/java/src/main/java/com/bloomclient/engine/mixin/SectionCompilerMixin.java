@@ -17,6 +17,8 @@ import net.minecraft.client.renderer.SectionBufferBuilderPack;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.BlockQuadOutput;
 import net.minecraft.client.renderer.block.BlockStateModelSet;
+import net.minecraft.client.renderer.block.FluidRenderer;
+import net.minecraft.client.renderer.block.FluidStateModelSet;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
@@ -27,6 +29,7 @@ import net.minecraft.client.renderer.chunk.VisibilitySet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,9 +41,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /**
  * Hooks the native mesher into vanilla's section compiler.
  *
- * <p>Vanilla keeps running the whole method: fluids, block entities, the
- * visibility graph input and every block the native mesher did not handle
- * go through the original code. {@code @WrapOperation} is used instead of
+ * <p>Vanilla keeps running the whole method: block entities, the visibility
+ * graph input and every block model or fluid the native mesher did not
+ * handle go through the original code. {@code @WrapOperation} is used instead of
  * overwrites so injections of other mods on the same calls keep working.
  */
 @Mixin(SectionCompiler.class)
@@ -48,6 +51,7 @@ abstract class SectionCompilerMixin {
 	@Shadow @Final private boolean ambientOcclusion;
 	@Shadow @Final private boolean cutoutLeaves;
 	@Shadow @Final private BlockStateModelSet blockModelSet;
+	@Shadow @Final private FluidStateModelSet fluidModelSet;
 	@Shadow @Final private BlockColors blockColors;
 
 	@Shadow
@@ -57,7 +61,7 @@ abstract class SectionCompilerMixin {
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void bloom$tables(CallbackInfo ci) {
-		BloomEngine.onCompilerCreated(blockModelSet, blockColors);
+		BloomEngine.onCompilerCreated(blockModelSet, fluidModelSet, blockColors);
 	}
 
 	@Inject(method = "compile", at = @At("HEAD"))
@@ -77,6 +81,15 @@ abstract class SectionCompilerMixin {
 			BlockPos pos, BlockState state, BlockStateModel model, long seed, Operation<Void> original) {
 		if (!SectionMesher.current().handledNatively(x, y, z)) {
 			original.call(renderer, output, x, y, z, level, pos, state, model, seed);
+		}
+	}
+
+	@WrapOperation(method = "compile", at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/renderer/block/FluidRenderer;tesselate(Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/client/renderer/block/FluidRenderer$Output;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/material/FluidState;)V"))
+	private void bloom$skipNativeFluids(FluidRenderer renderer, BlockAndTintGetter level, BlockPos pos, FluidRenderer.Output output, BlockState state,
+			FluidState fluid, Operation<Void> original) {
+		if (!SectionMesher.current().fluidHandledNatively(pos)) {
+			original.call(renderer, level, pos, output, state, fluid);
 		}
 	}
 

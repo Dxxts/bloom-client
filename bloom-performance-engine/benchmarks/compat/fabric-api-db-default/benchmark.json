@@ -1,0 +1,254 @@
+{
+  "scene": "world",
+  "minecraft": "26.3",
+  "engine": "OFF",
+  "engineReason": "compatibility: fabric-renderer-indigo (compatibility database (adapter v1); Indigo lights blocks differently from vanilla (ambient-occlusion-mode / fix-* in config/fabric/indigo-renderer.properties)), fabric-rendering-fluids-v1 (compatibility database (adapter v1); Indigo lights blocks differently from vanilla (ambient-occlusion-mode / fix-* in config/fabric/indigo-renderer.properties)), fabric-renderer-api-v1 (compatibility database (adapter v1); Indigo lights blocks differently from vanilla (ambient-occlusion-mode / fix-* in config/fabric/indigo-renderer.properties)), fabric-rendering-v1 (compatibility database (adapter v1); Indigo lights blocks differently from vanilla (ambient-occlusion-mode / fix-* in config/fabric/indigo-renderer.properties))",
+  "renderDistance": 16,
+  "graphicsBackendOption": "VULKAN",
+  "cpuThreads": 12,
+  "maxHeapMb": 4080,
+  "remeshAllSectionsMs": 636.9321,
+  "remeshTimedOut": false,
+  "remesh": {
+    "engineStatus": "OFF",
+    "engineReason": "compatibility: fabric-renderer-indigo (compatibility database (adapter v1); Indigo lights blocks differently from vanilla (ambient-occlusion-mode / fix-* in config/fabric/indigo-renderer.properties)), fabric-rendering-fluids-v1 (compatibility database (adapter v1); Indigo lights blocks differently from vanilla (ambient-occlusion-mode / fix-* in config/fabric/indigo-renderer.properties)), fabric-renderer-api-v1 (compatibility database (adapter v1); Indigo lights blocks differently from vanilla (ambient-occlusion-mode / fix-* in config/fabric/indigo-renderer.properties)), fabric-rendering-v1 (compatibility database (adapter v1); Indigo lights blocks differently from vanilla (ambient-occlusion-mode / fix-* in config/fabric/indigo-renderer.properties))",
+    "compileNativeMs": {
+      "count": 0
+    },
+    "compileVanillaMs": {
+      "count": 705,
+      "mean": 6.790892482269503,
+      "p50": 4.804,
+      "p95": 17.5194,
+      "p99": 42.7849,
+      "max": 126.8758,
+      "totalMs": 4787.5792
+    },
+    "snapshotMs": {
+      "count": 0
+    },
+    "nativeMeshMs": {
+      "count": 0
+    },
+    "nativeBlocks": 0,
+    "demotedBlocks": 0,
+    "nativeFluids": 0,
+    "demotedFluids": 0,
+    "frames": {
+      "count": 71,
+      "avgFps": 119.52805609670526,
+      "onePercentLowFps": 109.2752863012501,
+      "frameTimeMs": {
+        "p50": 8.3351,
+        "p99": 9.1512,
+        "max": 9.1512
+      },
+      "mainThreadWorkMsP50": 8.2779,
+      "stutters": 0
+    },
+    "render": {
+      "frames": 72,
+      "stagesPerFrame": {
+        "extract_entities": {
+          "maxMs": 0.3123,
+          "meanMs": 0.19072916666666664
+        },
+        "extract_block_entities": {
+          "maxMs": 0.1914,
+          "meanMs": 0.04786111111111111
+        },
+        "extract_particles": {
+          "maxMs": 0.0923,
+          "meanMs": 0.0707125
+        },
+        "submit_entities": {
+          "maxMs": 0.3525,
+          "meanMs": 0.03583888888888889
+        },
+        "submit_block_entities": {
+          "maxMs": 5.0E-4,
+          "meanMs": 2.3194444444444445E-4
+        },
+        "submit_particles": {
+          "maxMs": 0.0484,
+          "meanMs": 0.007915277777777778
+        },
+        "prepare_features": {
+          "maxMs": 0.4828,
+          "meanMs": 0.223775
+        },
+        "execute_frame_graph": {
+          "maxMs": 3.014,
+          "meanMs": 0.36254861111111114
+        }
+      },
+      "drawCallsPerFrame": 55.666666666666664,
+      "drawsPerFrame": 672.8888888888889,
+      "entitiesPerFrame": 4.541666666666667,
+      "blockEntitiesPerFrame": 0.0
+    },
+    "gpuFrame": {
+      "samples": 72,
+      "meanMs": 8.863380888888885,
+      "maxMs": 47.460832
+    },
+    "validatedSections": 0,
+    "validationSkippedLightChanged": 0,
+    "heapUsedMb": 1030,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.5687531527575062,
+    "native": {
+      "unavailable": "UnsatisfiedLinkError"
+    }
+  },
+  "rotate": {
+    "engineStatus": "OFF",
+    "engineReason": "compatibility: fabric-renderer-indigo (compatibility database (adapter v1); Indigo lights blocks differently from vanilla (ambient-occlusion-mode / fix-* in config/fabric/indigo-renderer.properties)), fabric-rendering-fluids-v1 (compatibility database (adapter v1); Indigo lights blocks differently from vanilla (ambient-occlusion-mode / fix-* in config/fabric/indigo-renderer.properties)), fabric-renderer-api-v1 (compatibility database (adapter v1); Indigo lights blocks differently from vanilla (ambient-occlusion-mode / fix-* in config/fabric/indigo-renderer.properties)), fabric-rendering-v1 (compatibility database (adapter v1); Indigo lights blocks differently from vanilla (ambient-occlusion-mode / fix-* in config/fabric/indigo-renderer.properties))",
+    "compileNativeMs": {
+      "count": 0
+    },
+    "compileVanillaMs": {
+      "count": 1271,
+      "mean": 5.554989929189614,
+      "p50": 5.0589,
+      "p95": 10.5304,
+      "p99": 19.9841,
+      "max": 72.9977,
+      "totalMs": 7060.3922
+    },
+    "snapshotMs": {
+      "count": 0
+    },
+    "nativeMeshMs": {
+      "count": 0
+    },
+    "nativeBlocks": 0,
+    "demotedBlocks": 0,
+    "nativeFluids": 0,
+    "demotedFluids": 0,
+    "frames": {
+      "count": 1168,
+      "avgFps": 117.80196817436612,
+      "onePercentLowFps": 61.41230434598129,
+      "frameTimeMs": {
+        "p50": 8.3393,
+        "p99": 9.5885,
+        "max": 38.0708
+      },
+      "mainThreadWorkMsP50": 8.2802,
+      "stutters": 2
+    },
+    "render": {
+      "frames": 1169,
+      "stagesPerFrame": {
+        "extract_entities": {
+          "maxMs": 1.2734,
+          "meanMs": 0.20272634730538922
+        },
+        "extract_block_entities": {
+          "maxMs": 0.4346,
+          "meanMs": 0.08501086398631308
+        },
+        "extract_particles": {
+          "maxMs": 0.3308,
+          "meanMs": 0.06382540633019675
+        },
+        "submit_entities": {
+          "maxMs": 2.5364,
+          "meanMs": 0.06723635585970915
+        },
+        "submit_block_entities": {
+          "maxMs": 0.0159,
+          "meanMs": 2.694610778443114E-4
+        },
+        "submit_particles": {
+          "maxMs": 0.0815,
+          "meanMs": 0.0034214713430282292
+        },
+        "prepare_features": {
+          "maxMs": 6.7299,
+          "meanMs": 0.2811751069289991
+        },
+        "execute_frame_graph": {
+          "maxMs": 9.8998,
+          "meanMs": 0.2707998289136013
+        }
+      },
+      "drawCallsPerFrame": 55.948674080410605,
+      "drawsPerFrame": 1546.3567151411462,
+      "entitiesPerFrame": 7.688622754491018,
+      "blockEntitiesPerFrame": 0.0
+    },
+    "gpuFrame": {
+      "samples": 1169,
+      "meanMs": 8.554146107784424,
+      "maxMs": 91.032064
+    },
+    "validatedSections": 0,
+    "validationSkippedLightChanged": 0,
+    "heapUsedMb": 1751,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.2617835603312507,
+    "native": {
+      "unavailable": "UnsatisfiedLinkError"
+    }
+  },
+  "vram": {
+    "usedMiB": 546,
+    "source": "Vulkan VMA budget (device-local heaps)",
+    "totalMiB": 4943
+  },
+  "gpuDevice": "NVIDIA GeForce GTX 1660 SUPER",
+  "gpuBackend": "Vulkan",
+  "nativeFluids": true,
+  "mods": [
+    "bloom-engine@0.2.0",
+    "fabric-advancement-api-v1@1.0.1+38c7a2d55d",
+    "fabric-api-base@2.0.6+fcdff87f5d",
+    "fabric-api-lookup-api-v1@2.0.24+3434d6d95d",
+    "fabric-api@0.165.0+26.3",
+    "fabric-biome-api-v1@20.1.1+85210bca5d",
+    "fabric-block-api-v1@3.1.0+0ae6f9115d",
+    "fabric-block-getter-api-v2@2.0.9+3434d6d95d",
+    "fabric-command-api-v2@3.1.2+fcdff87f5d",
+    "fabric-content-registries-v0@15.0.6+74ed1ea55d",
+    "fabric-convention-tags-v2@4.10.5+187b64905d",
+    "fabric-crash-report-info-v1@1.0.7+fcdff87f5d",
+    "fabric-creative-tab-api-v1@5.0.22+fcdff87f5d",
+    "fabric-data-attachment-api-v1@2.2.33+b9b88df45d",
+    "fabric-data-generation-api-v1@27.4.2+187b64905d",
+    "fabric-debug-api-v1@1.0.5+5af7744b5d",
+    "fabric-dimensions-v1@5.1.20+5af7744b5d",
+    "fabric-entity-events-v1@6.0.4+3434d6d95d",
+    "fabric-events-interaction-v0@5.3.9+b9b88df45d",
+    "fabric-game-rule-api-v1@4.0.10+3434d6d95d",
+    "fabric-item-api-v1@14.8.0+d1c0d72b5d",
+    "fabric-key-mapping-api-v1@2.0.8+3434d6d95d",
+    "fabric-lifecycle-events-v1@4.1.9+ffef5f675d",
+    "fabric-loot-api-v3@4.0.9+4068fd645d",
+    "fabric-menu-api-v1@2.0.30+ed66f0a35d",
+    "fabric-message-api-v1@7.0.10+3434d6d95d",
+    "fabric-model-loading-api-v1@8.0.37+fcdff87f5d",
+    "fabric-networking-api-v1@6.4.0+a21c9eb65d",
+    "fabric-object-builder-api-v1@24.1.12+e2f63d3e5d",
+    "fabric-particles-v1@5.0.27+3434d6d95d",
+    "fabric-permission-api-v1@1.0.8+fcdff87f5d",
+    "fabric-recipe-api-v1@10.0.11+b9b88df45d",
+    "fabric-registry-sync-v0@8.0.4+1ca9f6365d",
+    "fabric-renderer-api-v1@17.0.17+79385d0b5d",
+    "fabric-renderer-indigo@9.1.25+b9d63e335d",
+    "fabric-rendering-fluids-v1@6.0.6+3434d6d95d",
+    "fabric-rendering-v1@27.2.0+eb9fe70b5d",
+    "fabric-resource-conditions-api-v1@6.2.0+0d124ae85d",
+    "fabric-resource-loader-v0@3.3.27+4fc5413f5d",
+    "fabric-resource-loader-v1@3.1.0+5af7744b5d",
+    "fabric-screen-api-v1@5.2.4+48607d035d",
+    "fabric-serialization-api-v1@2.0.7+74ed1ea55d",
+    "fabric-sound-api-v1@2.0.7+3434d6d95d",
+    "fabric-tag-api-v1@2.1.11+fcdff87f5d",
+    "fabric-transfer-api-v1@8.0.25+fcdff87f5d",
+    "fabric-transitive-access-wideners-v1@8.1.17+e2f63d3e5d",
+    "fabricloader@0.20.1",
+    "mixinextras@0.5.5"
+  ]
+}

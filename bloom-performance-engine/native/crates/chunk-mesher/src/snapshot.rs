@@ -25,6 +25,20 @@ pub struct Snapshot<'a> {
     pub tint_count: usize,
     pub offsets: &'a [u8],
     pub offset_count: usize,
+    pub fluids: &'a [u8],
+    pub fluid_count: usize,
+}
+
+/// Per-block fluid values only Java can compute.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct FluidEntry {
+    pub index: usize,
+    /// `colorInWorld` of the fluid's tint source, or -1.
+    pub tint: i32,
+    /// `(s, c)` of `FluidRenderer` when the flow is not zero.
+    pub flow: Option<(f32, f32)>,
+    /// `flow` was computed; `None` then means a zero flow.
+    pub flow_known: bool,
 }
 
 impl<'a> Snapshot<'a> {
@@ -37,7 +51,8 @@ impl<'a> Snapshot<'a> {
         let epoch = r.u32(8).ok_or(SnapshotError::Truncated)?;
         let tint_count = r.u32(12).ok_or(SnapshotError::Truncated)? as usize;
         let offset_count = r.u32(16).ok_or(SnapshotError::Truncated)? as usize;
-        if tint_count > SECTION_VOLUME || offset_count > SECTION_VOLUME {
+        let fluid_count = r.u32(SNAPSHOT_FLUID_COUNT_OFFSET).ok_or(SnapshotError::Truncated)? as usize;
+        if tint_count > SECTION_VOLUME || offset_count > SECTION_VOLUME || fluid_count > SECTION_VOLUME {
             return Err(SnapshotError::BadIndex);
         }
         let section = [
@@ -51,6 +66,7 @@ impl<'a> Snapshot<'a> {
         }
         let tint_offset = SNAPSHOT_TABLES_OFFSET;
         let offsets_offset = tint_offset + tint_count * TINT_ENTRY_SIZE;
+        let fluids_offset = offsets_offset + offset_count * OFFSET_ENTRY_SIZE;
         Ok(Self {
             flags,
             epoch,
@@ -63,6 +79,8 @@ impl<'a> Snapshot<'a> {
             tint_count,
             offsets: r.slice(offsets_offset, offset_count * OFFSET_ENTRY_SIZE).ok_or(SnapshotError::Truncated)?,
             offset_count,
+            fluids: r.slice(fluids_offset, fluid_count * FLUID_ENTRY_SIZE).ok_or(SnapshotError::Truncated)?,
+            fluid_count,
         })
     }
 
@@ -74,6 +92,11 @@ impl<'a> Snapshot<'a> {
     #[inline]
     pub fn cutout_leaves(&self) -> bool {
         self.flags & SNAPSHOT_FLAG_CUTOUT_LEAVES != 0
+    }
+
+    #[inline]
+    pub fn native_fluids(&self) -> bool {
+        self.flags & SNAPSHOT_FLAG_NATIVE_FLUIDS != 0
     }
 
     /// Global state id at local coordinates in `-2..=17`.
@@ -116,10 +139,23 @@ impl<'a> Snapshot<'a> {
         Some((index, count, colors))
     }
 
+    /// Origin of a block with an offset function (section-relative position plus offset).
     pub fn offset_entry(&self, i: usize) -> Option<(usize, [f32; 3])> {
         let r = Reader::new(self.offsets);
         let o = i * OFFSET_ENTRY_SIZE;
         Some((r.u16(o)? as usize, [r.f32(o + 4)?, r.f32(o + 8)?, r.f32(o + 12)?]))
+    }
+
+    pub fn fluid_entry(&self, i: usize) -> Option<FluidEntry> {
+        let r = Reader::new(self.fluids);
+        let o = i * FLUID_ENTRY_SIZE;
+        let flags = r.u8(o + 2)?;
+        Some(FluidEntry {
+            index: r.u16(o)? as usize,
+            tint: r.i32(o + 4)?,
+            flow: if flags & FLUID_ENTRY_HAS_FLOW != 0 { Some((r.f32(o + 8)?, r.f32(o + 12)?)) } else { None },
+            flow_known: flags & FLUID_ENTRY_FLOW_KNOWN != 0,
+        })
     }
 }
 
@@ -129,6 +165,7 @@ pub struct SnapshotBuilder {
     pub w: Writer,
     tints: Vec<(u16, Vec<i32>)>,
     offsets: Vec<(u16, [f32; 3])>,
+    fluids: Vec<FluidEntry>,
 }
 
 impl SnapshotBuilder {
@@ -144,7 +181,7 @@ impl SnapshotBuilder {
         for (i, c) in cardinal.iter().enumerate() {
             w.put_f32(32 + i * 4, *c);
         }
-        Self { w, tints: Vec::new(), offsets: Vec::new() }
+        Self { w, tints: Vec::new(), offsets: Vec::new(), fluids: Vec::new() }
     }
 
     pub fn set_state(&mut self, x: i32, y: i32, z: i32, id: u32) {
@@ -173,9 +210,14 @@ impl SnapshotBuilder {
         self.offsets.push((index as u16, offset));
     }
 
+    pub fn add_fluid(&mut self, entry: FluidEntry) {
+        self.fluids.push(entry);
+    }
+
     pub fn finish(mut self) -> Vec<u8> {
         self.w.put_u32(12, self.tints.len() as u32);
         self.w.put_u32(16, self.offsets.len() as u32);
+        self.w.put_u32(SNAPSHOT_FLUID_COUNT_OFFSET, self.fluids.len() as u32);
         let mut bytes = self.w.bytes;
         for (index, colors) in &self.tints {
             let mut e = [0u8; TINT_ENTRY_SIZE];
@@ -194,6 +236,24 @@ impl SnapshotBuilder {
             }
             bytes.extend_from_slice(&e);
         }
+        for f in &self.fluids {
+            bytes.extend_from_slice(&encode_fluid_entry(f));
+        }
         bytes
     }
+}
+
+pub fn encode_fluid_entry(f: &FluidEntry) -> [u8; FLUID_ENTRY_SIZE] {
+    let mut e = [0u8; FLUID_ENTRY_SIZE];
+    e[0..2].copy_from_slice(&(f.index as u16).to_le_bytes());
+    e[4..8].copy_from_slice(&f.tint.to_le_bytes());
+    if f.flow_known {
+        e[2] = FLUID_ENTRY_FLOW_KNOWN;
+    }
+    if let Some((s, c)) = f.flow {
+        e[2] |= FLUID_ENTRY_HAS_FLOW | FLUID_ENTRY_FLOW_KNOWN;
+        e[8..12].copy_from_slice(&s.to_le_bytes());
+        e[12..16].copy_from_slice(&c.to_le_bytes());
+    }
+    e
 }

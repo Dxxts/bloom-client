@@ -1,16 +1,17 @@
-//! Binary protocol between the Java bridge and the native engine (version 1).
+//! Binary protocol between the Java bridge and the native engine (version 2).
 //!
 //! All buffers are little-endian, live in off-heap memory owned by Java and
 //! are only read during the call that receives them. Layouts are documented
 //! in `docs/PROTOCOLLO.md`; the constants below are the source of truth and
 //! are mirrored in `com.bloomclient.engine.bridge.Protocol`.
 
-pub const PROTOCOL_VERSION: u32 = 1;
+pub const PROTOCOL_VERSION: u32 = 2;
 
 pub const SNAPSHOT_MAGIC: u32 = u32::from_le_bytes(*b"BLMS");
 pub const STATE_TABLE_MAGIC: u32 = u32::from_le_bytes(*b"BLST");
 pub const SHAPE_PAIRS_MAGIC: u32 = u32::from_le_bytes(*b"BLSP");
 pub const MODEL_MAGIC: u32 = u32::from_le_bytes(*b"BLMD");
+pub const FLUID_MODELS_MAGIC: u32 = u32::from_le_bytes(*b"BLFM");
 
 // ---- Section snapshot ------------------------------------------------------
 
@@ -34,10 +35,40 @@ pub const SNAPSHOT_MODELS_LEN: usize = SECTION_VOLUME * 4;
 pub const SNAPSHOT_TABLES_OFFSET: usize = SNAPSHOT_MODELS_OFFSET + SNAPSHOT_MODELS_LEN;
 pub const TINT_ENTRY_SIZE: usize = 16;
 pub const MAX_TINTS: usize = 3;
+/// `u16` block index, 2 reserved, then the block's origin as 3 × `f32`
+/// (section-relative position plus `getOffset`), computed by Java in the
+/// arithmetic of the active renderer.
 pub const OFFSET_ENTRY_SIZE: usize = 16;
 
 pub const SNAPSHOT_FLAG_AMBIENT_OCCLUSION: u16 = 1;
 pub const SNAPSHOT_FLAG_CUTOUT_LEAVES: u16 = 1 << 1;
+/// Fluids are tesselated natively (`FluidRenderer` port).
+pub const SNAPSHOT_FLAG_NATIVE_FLUIDS: u16 = 1 << 2;
+
+/// Header offset of the number of fluid entries, which follow the offsets.
+pub const SNAPSHOT_FLUID_COUNT_OFFSET: usize = 56;
+/// `u16` block index, `u8` flags ([`FLUID_ENTRY_HAS_FLOW`],
+/// [`FLUID_ENTRY_FLOW_KNOWN`]), 1 reserved,
+/// `i32` tint (ARGB, -1 when the fluid model has no tint source), then the
+/// flow terms `s` and `c` of `FluidRenderer` as `f32`.
+pub const FLUID_ENTRY_SIZE: usize = 16;
+pub const FLUID_ENTRY_HAS_FLOW: u8 = 1;
+/// Java computed the flow (it does so only when the plan asked for it).
+pub const FLUID_ENTRY_FLOW_KNOWN: u8 = 2;
+
+// ---- Plan (output of the first pass) ------------------------------------------
+
+/// Light mask (one bit per position of the 18³ light grid), padded.
+pub const PLAN_LIGHT_MASK_BYTES: usize = (LIGHT_DIM * LIGHT_DIM * LIGHT_DIM).div_ceil(8);
+pub const PLAN_FLUID_COUNT_OFFSET: usize = 736;
+/// `u16` per fluid block Java must describe: block index, plus
+/// [`PLAN_FLUID_NEEDS_FLOW`] when its top face is drawn.
+pub const PLAN_FLUIDS_OFFSET: usize = 740;
+pub const PLAN_FLUID_NEEDS_FLOW: u16 = 0x8000;
+pub const PLAN_SIZE: usize = PLAN_FLUIDS_OFFSET + SECTION_VOLUME * 2;
+
+/// Set in a demoted index when the fluid (not the block model) goes back to Java.
+pub const DEMOTED_FLUID_BIT: u16 = 0x8000;
 
 /// Model slot value: nothing to tesselate (air, invisible, block entity only).
 pub const MODEL_NONE: u32 = 0;
@@ -77,6 +108,11 @@ pub mod state_flags {
     pub const LEAVES: u32 = 1 << 6;
     /// `BlockColors.getTintSources(state)` is not empty: Java sends tint values.
     pub const TINTED: u32 = 1 << 7;
+    /// `BlockState.isSolid()` (legacy "solid" property, read by fluid heights).
+    pub const SOLID: u32 = 1 << 8;
+    /// The block is a `HalfTransparentBlock` or a `LeavesBlock`: fluid sides
+    /// facing it use the overlay sprite.
+    pub const OVERLAY_NEIGHBOR: u32 = 1 << 9;
     /// Set only on the placeholder for ids missing from the table.
     pub const UNKNOWN: u32 = 1 << 31;
 }
@@ -89,6 +125,22 @@ pub mod skip_rule {
     /// `LeavesBlock`: skip faces against leaves unless cutout leaves are on.
     pub const LEAVES: u8 = 2;
 }
+
+/// Fluid group of a state (`StateInfo::fluid_group`). States whose fluids
+/// are the same per `Fluid.isSame` share a group.
+pub mod fluid_group {
+    /// `EmptyFluid`.
+    pub const NONE: u8 = 0;
+    /// A fluid whose class Bloom has not verified (mods): never meshed
+    /// natively, and fluids next to it go back to Java.
+    pub const UNVERIFIED: u8 = 255;
+}
+
+/// Fluid model records appended to the state table: `u8` layer, `u8` flags,
+/// 2 reserved, then still, flowing and overlay sprites as `(u0, u1, v0, v1)`.
+pub const FLUID_MODEL_RECORD_SIZE: usize = 64;
+pub const FLUID_MODEL_TINTED: u8 = 1;
+pub const FLUID_MODEL_HAS_OVERLAY: u8 = 2;
 
 /// 2-bit face occlusion class, per direction.
 pub mod face_class {

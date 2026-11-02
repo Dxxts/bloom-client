@@ -1,0 +1,15 @@
+[package]
+name = "bloom-gpu-bench"
+description = "GPU benchmark of the experimental Bloom Vulkan backend on Bloom section meshes."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+bloom-bench.workspace = true
+bloom-core.workspace = true
+bloom-vulkan.workspace = true
+chunk-mesher.workspace = true
+ash = { version = "0.38", default-features = false, features = ["loaded", "debug", "std"] }

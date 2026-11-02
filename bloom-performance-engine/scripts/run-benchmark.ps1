@@ -1,21 +1,30 @@
 <#
 .SYNOPSIS
-  Runs the in-game A/B benchmark: vanilla renderer, then Bloom native engine,
-  same world, same options, uncapped frame rate. The game window is moved to
-  the monitor given by -Display (default: the primary monitor).
+  Runs the in-game benchmark matrix: every engine (vanilla renderer, Bloom
+  native) on every graphics backend (OpenGL, Vulkan), same world, same
+  options, uncapped frame rate, repeated -Repeat times in interleaved order
+  so that drift (heat, background load) hits every configuration alike.
+  The game window is moved to the monitor given by -Display (default: the
+  primary monitor).
 
 .EXAMPLE
-  .\scripts\run-benchmark.ps1 -World "New World" -Duration 30
+  .\scripts\run-benchmark.ps1 -World "New World" -Duration 30 -Repeat 3
+  .\scripts\run-benchmark.ps1 -Engines bloom -Backends vulkan -Fluids false   # native fluids off
 #>
 param(
 	[string]$World = "New World",
 	[string]$BenchWorld = "bloom-bench",
 	[int]$Duration = 30,
+	[int]$Repeat = 1,
+	[string[]]$Engines = @("vanilla", "bloom"),
+	[string[]]$Backends = @("opengl", "vulkan"),
+	[string]$Fluids = "true",
 	[string]$Display = ""
 )
 $ErrorActionPreference = "Stop"
 $java = Join-Path $PSScriptRoot "..\java"
 $options = Join-Path $java "run\options.txt"
+$results = Join-Path $java "run\.bloom\benchmarks"
 $env:GRADLE_USER_HOME = "D:\bloom-build\gradle-home"
 
 Add-Type -AssemblyName System.Windows.Forms
@@ -46,26 +55,32 @@ public static class BloomWin {
 }
 '@
 
-# Identical, uncapped settings for both runs; the user's options come back afterwards.
+# Identical, uncapped settings for every run; the user's options come back afterwards.
 $backup = "$options.bloom-backup"
 Copy-Item $options $backup -Force
+$written = @()
 try {
-	# Minecraft cannot read options.txt with a BOM: write plain UTF-8.
-	$lines = (Get-Content $options) -replace '^enableVsync:.*', 'enableVsync:false' -replace '^maxFps:.*', 'maxFps:260'
-	[System.IO.File]::WriteAllLines($options, [string[]]$lines, (New-Object System.Text.UTF8Encoding $false))
-	# Both runs load a fresh copy of the same world (a name without spaces survives the
-	# Gradle → JVM argument passing; the original world is never touched).
+	$base = (Get-Content $options) -replace '^enableVsync:.*', 'enableVsync:false' -replace '^maxFps:.*', 'maxFps:260'
+	# Every run loads a fresh copy of the same world (a name without spaces survives the
+	# Gradle -> JVM argument passing; the original world is never touched).
 	$saves = Join-Path $java "run\saves"
 	$source = Join-Path $saves $World
 	if (-not (Test-Path $source)) { throw "world '$World' not found in $saves" }
-	foreach ($engine in @("false", "true")) {
-		$label = if ($engine -eq "true") { "Bloom native" } else { "vanilla" }
+	$runs = foreach ($rep in 1..$Repeat) { foreach ($backend in $Backends) { foreach ($e in $Engines) { [pscustomobject]@{ Rep = $rep; Backend = $backend; Engine = $e } } } }
+	foreach ($run in $runs) {
+		$engine = if ($run.Engine -eq "bloom") { "true" } else { "false" }
+		$label = "$($run.Engine) / $($run.Backend) / run $($run.Rep) of $Repeat"
 		Write-Host "== $label"
+		# Minecraft cannot read options.txt with a BOM: write plain UTF-8.
+		$lines = $base -replace '^preferredGraphicsBackend:.*', "preferredGraphicsBackend:`"$($run.Backend)`""
+		[System.IO.File]::WriteAllLines($options, [string[]]$lines, (New-Object System.Text.UTF8Encoding $false))
+		$before = @(Get-ChildItem $results -ErrorAction SilentlyContinue | ForEach-Object FullName)
 		$copy = Join-Path $saves $BenchWorld
 		if (Test-Path $copy) { Remove-Item $copy -Recurse -Force }
 		Copy-Item $source $copy -Recurse
 		$proc = Start-Process -FilePath (Join-Path $java "gradlew.bat") -WorkingDirectory $java -NoNewWindow -PassThru `
-			-ArgumentList "runBenchmark", "--no-daemon", "-q", "-Pbench.world=$BenchWorld", "-Pbench.engine=$engine", "-Pbench.duration=$Duration"
+			-ArgumentList "runBenchmark", "--no-daemon", "-q", "-Pbench.world=$BenchWorld", "-Pbench.engine=$engine", "-Pbench.duration=$Duration", `
+			"-Pbench.fluids=$Fluids", "-Pbench.screenshot=false"
 		$deadline = (Get-Date).AddMinutes(6); $moved = $false
 		while (-not $proc.HasExited -and (Get-Date) -lt $deadline) {
 			if (-not $moved) {
@@ -82,8 +97,9 @@ try {
 			Start-Sleep -Milliseconds 500
 		}
 		if (-not $proc.HasExited) { & taskkill /T /F /PID $proc.Id | Out-Null; throw "benchmark ($label) timed out" }
+		$written += Get-ChildItem $results | Where-Object { $before -notcontains $_.FullName } | ForEach-Object FullName
 	}
 } finally {
 	Move-Item $backup $options -Force
 }
-Get-ChildItem (Join-Path $java "run\.bloom\benchmarks") | Sort-Object LastWriteTime | Select-Object -Last 2 | ForEach-Object { $_.FullName }
+$written

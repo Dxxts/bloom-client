@@ -30,13 +30,12 @@ import net.minecraft.client.resources.model.SimpleModelWrapper;
  * quads on every call.
  */
 public final class BloomRenderAdapters {
+	private static final Set<Class<?>> BUILT_IN_MODELS = Set.of(SingleVariant.class, WeightedVariants.class, MultiPartModel.class);
 	private static final Set<Class<?>> STATIC_MODELS = ConcurrentHashMap.newKeySet();
 	private static final Set<Class<?>> STATIC_PARTS = ConcurrentHashMap.newKeySet();
 
 	static {
-		STATIC_MODELS.add(SingleVariant.class);
-		STATIC_MODELS.add(WeightedVariants.class);
-		STATIC_MODELS.add(MultiPartModel.class);
+		STATIC_MODELS.addAll(BUILT_IN_MODELS);
 		STATIC_PARTS.add(SimpleModelWrapper.class);
 	}
 
@@ -55,6 +54,15 @@ public final class BloomRenderAdapters {
 
 	public static boolean isStaticModel(BlockStateModel model) {
 		return STATIC_MODELS.contains(model.getClass());
+	}
+
+	/** Vanilla's own static model classes (the automatic adapter), as opposed to registered ones. */
+	public static boolean isBuiltInModel(BlockStateModel model) {
+		return BUILT_IN_MODELS.contains(model.getClass());
+	}
+
+	public static int registeredAdapters() {
+		return STATIC_MODELS.size() - BUILT_IN_MODELS.size() + STATIC_PARTS.size() - 1;
 	}
 
 	public static boolean isStaticPart(BlockStateModelPart part) {

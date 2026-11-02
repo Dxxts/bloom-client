@@ -1,0 +1,252 @@
+{
+  "scene": "world",
+  "minecraft": "26.3",
+  "engine": "OFF",
+  "engineReason": "compatibility: fabric-rendering-v1 (unverified hooks on net.minecraft.client.renderer.block.ModelBlockRenderer), fabric-renderer-indigo (unverified hooks on net.minecraft.client.renderer.block.BlockModelLighter), fabric-renderer-api-v1 (unverified hooks on net.minecraft.client.renderer.block.BlockStateModelSet, net.minecraft.client.renderer.chunk.SectionCompiler), fabric-rendering-fluids-v1 (unverified hooks on net.minecraft.client.renderer.block.FluidRenderer, net.minecraft.client.renderer.block.FluidStateModelSet)",
+  "renderDistance": 16,
+  "graphicsBackendOption": "VULKAN",
+  "cpuThreads": 12,
+  "maxHeapMb": 4080,
+  "remeshAllSectionsMs": 980.0914,
+  "remeshTimedOut": false,
+  "remesh": {
+    "engineStatus": "OFF",
+    "engineReason": "compatibility: fabric-rendering-v1 (unverified hooks on net.minecraft.client.renderer.block.ModelBlockRenderer), fabric-renderer-indigo (unverified hooks on net.minecraft.client.renderer.block.BlockModelLighter), fabric-renderer-api-v1 (unverified hooks on net.minecraft.client.renderer.block.BlockStateModelSet, net.minecraft.client.renderer.chunk.SectionCompiler), fabric-rendering-fluids-v1 (unverified hooks on net.minecraft.client.renderer.block.FluidRenderer, net.minecraft.client.renderer.block.FluidStateModelSet)",
+    "compileNativeMs": {
+      "count": 0
+    },
+    "compileVanillaMs": {
+      "count": 666,
+      "mean": 12.28489954954955,
+      "p50": 7.8751,
+      "p95": 42.0987,
+      "p99": 103.2258,
+      "max": 160.3041,
+      "totalMs": 8181.7431
+    },
+    "snapshotMs": {
+      "count": 0
+    },
+    "nativeMeshMs": {
+      "count": 0
+    },
+    "nativeBlocks": 0,
+    "demotedBlocks": 0,
+    "nativeFluids": 0,
+    "demotedFluids": 0,
+    "frames": {
+      "count": 105,
+      "avgFps": 112.02699402448013,
+      "onePercentLowFps": 53.442212935153215,
+      "frameTimeMs": {
+        "max": 18.7118,
+        "p50": 8.3506,
+        "p99": 13.6953
+      },
+      "mainThreadWorkMsP50": 8.2814,
+      "stutters": 0
+    },
+    "render": {
+      "frames": 106,
+      "stagesPerFrame": {
+        "extract_entities": {
+          "maxMs": 0.8156,
+          "meanMs": 0.2830424528301887
+        },
+        "extract_block_entities": {
+          "maxMs": 0.5,
+          "meanMs": 0.07908584905660378
+        },
+        "extract_particles": {
+          "maxMs": 0.3272,
+          "meanMs": 0.1038933962264151
+        },
+        "submit_entities": {
+          "maxMs": 0.2121,
+          "meanMs": 0.06725754716981132
+        },
+        "submit_block_entities": {
+          "maxMs": 0.0254,
+          "meanMs": 7.849056603773585E-4
+        },
+        "submit_particles": {
+          "maxMs": 0.0149,
+          "meanMs": 0.005275471698113208
+        },
+        "prepare_features": {
+          "maxMs": 0.7953,
+          "meanMs": 0.37099339622641514
+        },
+        "execute_frame_graph": {
+          "maxMs": 3.982,
+          "meanMs": 0.4621867924528302
+        }
+      },
+      "drawCallsPerFrame": 58.5,
+      "drawsPerFrame": 805.8679245283018,
+      "entitiesPerFrame": 6.216981132075472,
+      "blockEntitiesPerFrame": 0.0
+    },
+    "gpuFrame": {
+      "samples": 106,
+      "meanMs": 9.231201509433959,
+      "maxMs": 48.674816
+    },
+    "validatedSections": 0,
+    "heapUsedMb": 1164,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.48031068074451355,
+    "native": {
+      "unavailable": "UnsatisfiedLinkError"
+    }
+  },
+  "rotate": {
+    "engineStatus": "OFF",
+    "engineReason": "compatibility: fabric-rendering-v1 (unverified hooks on net.minecraft.client.renderer.block.ModelBlockRenderer), fabric-renderer-indigo (unverified hooks on net.minecraft.client.renderer.block.BlockModelLighter), fabric-renderer-api-v1 (unverified hooks on net.minecraft.client.renderer.block.BlockStateModelSet, net.minecraft.client.renderer.chunk.SectionCompiler), fabric-rendering-fluids-v1 (unverified hooks on net.minecraft.client.renderer.block.FluidRenderer, net.minecraft.client.renderer.block.FluidStateModelSet)",
+    "compileNativeMs": {
+      "count": 0
+    },
+    "compileVanillaMs": {
+      "count": 1346,
+      "mean": 7.497330534918277,
+      "p50": 6.2927,
+      "p95": 18.2011,
+      "p99": 29.7571,
+      "max": 60.8806,
+      "totalMs": 10091.4069
+    },
+    "snapshotMs": {
+      "count": 0
+    },
+    "nativeMeshMs": {
+      "count": 0
+    },
+    "nativeBlocks": 0,
+    "demotedBlocks": 0,
+    "nativeFluids": 0,
+    "demotedFluids": 0,
+    "frames": {
+      "count": 1142,
+      "avgFps": 115.12976147381741,
+      "onePercentLowFps": 39.50160466291306,
+      "frameTimeMs": {
+        "max": 57.7721,
+        "p50": 8.3424,
+        "p99": 14.5906
+      },
+      "mainThreadWorkMsP50": 8.2805,
+      "stutters": 2
+    },
+    "render": {
+      "frames": 1143,
+      "stagesPerFrame": {
+        "extract_entities": {
+          "maxMs": 1.8815,
+          "meanMs": 0.2438488188976378
+        },
+        "extract_block_entities": {
+          "maxMs": 0.6705,
+          "meanMs": 0.0942686789151356
+        },
+        "extract_particles": {
+          "maxMs": 0.9902,
+          "meanMs": 0.07748731408573929
+        },
+        "submit_entities": {
+          "maxMs": 3.3292,
+          "meanMs": 0.08181872265966755
+        },
+        "submit_block_entities": {
+          "maxMs": 0.0197,
+          "meanMs": 3.251968503937008E-4
+        },
+        "submit_particles": {
+          "maxMs": 0.0388,
+          "meanMs": 0.003396675415573053
+        },
+        "prepare_features": {
+          "maxMs": 6.69,
+          "meanMs": 0.3232774278215223
+        },
+        "execute_frame_graph": {
+          "maxMs": 10.4107,
+          "meanMs": 0.3328536307961505
+        }
+      },
+      "drawCallsPerFrame": 56.93963254593176,
+      "drawsPerFrame": 1513.883639545057,
+      "entitiesPerFrame": 7.244094488188976,
+      "blockEntitiesPerFrame": 0.0
+    },
+    "gpuFrame": {
+      "samples": 1143,
+      "meanMs": 8.74999839020123,
+      "maxMs": 85.043744
+    },
+    "validatedSections": 0,
+    "heapUsedMb": 874,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.29734083475358536,
+    "native": {
+      "unavailable": "UnsatisfiedLinkError"
+    }
+  },
+  "vram": {
+    "source": "Vulkan VMA budget (device-local heaps)",
+    "totalMiB": 4943,
+    "usedMiB": 546
+  },
+  "gpuDevice": "NVIDIA GeForce GTX 1660 SUPER",
+  "gpuBackend": "Vulkan",
+  "nativeFluids": true,
+  "mods": [
+    "bloom-engine@0.1.0",
+    "fabric-advancement-api-v1@1.0.1+38c7a2d55d",
+    "fabric-api-base@2.0.6+fcdff87f5d",
+    "fabric-api-lookup-api-v1@2.0.24+3434d6d95d",
+    "fabric-api@0.165.0+26.3",
+    "fabric-biome-api-v1@20.1.1+85210bca5d",
+    "fabric-block-api-v1@3.1.0+0ae6f9115d",
+    "fabric-block-getter-api-v2@2.0.9+3434d6d95d",
+    "fabric-command-api-v2@3.1.2+fcdff87f5d",
+    "fabric-content-registries-v0@15.0.6+74ed1ea55d",
+    "fabric-convention-tags-v2@4.10.5+187b64905d",
+    "fabric-crash-report-info-v1@1.0.7+fcdff87f5d",
+    "fabric-creative-tab-api-v1@5.0.22+fcdff87f5d",
+    "fabric-data-attachment-api-v1@2.2.33+b9b88df45d",
+    "fabric-data-generation-api-v1@27.4.2+187b64905d",
+    "fabric-debug-api-v1@1.0.5+5af7744b5d",
+    "fabric-dimensions-v1@5.1.20+5af7744b5d",
+    "fabric-entity-events-v1@6.0.4+3434d6d95d",
+    "fabric-events-interaction-v0@5.3.9+b9b88df45d",
+    "fabric-game-rule-api-v1@4.0.10+3434d6d95d",
+    "fabric-item-api-v1@14.8.0+d1c0d72b5d",
+    "fabric-key-mapping-api-v1@2.0.8+3434d6d95d",
+    "fabric-lifecycle-events-v1@4.1.9+ffef5f675d",
+    "fabric-loot-api-v3@4.0.9+4068fd645d",
+    "fabric-menu-api-v1@2.0.30+ed66f0a35d",
+    "fabric-message-api-v1@7.0.10+3434d6d95d",
+    "fabric-model-loading-api-v1@8.0.37+fcdff87f5d",
+    "fabric-networking-api-v1@6.4.0+a21c9eb65d",
+    "fabric-object-builder-api-v1@24.1.12+e2f63d3e5d",
+    "fabric-particles-v1@5.0.27+3434d6d95d",
+    "fabric-permission-api-v1@1.0.8+fcdff87f5d",
+    "fabric-recipe-api-v1@10.0.11+b9b88df45d",
+    "fabric-registry-sync-v0@8.0.4+1ca9f6365d",
+    "fabric-renderer-api-v1@17.0.17+79385d0b5d",
+    "fabric-renderer-indigo@9.1.25+b9d63e335d",
+    "fabric-rendering-fluids-v1@6.0.6+3434d6d95d",
+    "fabric-rendering-v1@27.2.0+eb9fe70b5d",
+    "fabric-resource-conditions-api-v1@6.2.0+0d124ae85d",
+    "fabric-resource-loader-v0@3.3.27+4fc5413f5d",
+    "fabric-resource-loader-v1@3.1.0+5af7744b5d",
+    "fabric-screen-api-v1@5.2.4+48607d035d",
+    "fabric-serialization-api-v1@2.0.7+74ed1ea55d",
+    "fabric-sound-api-v1@2.0.7+3434d6d95d",
+    "fabric-tag-api-v1@2.1.11+fcdff87f5d",
+    "fabric-transfer-api-v1@8.0.25+fcdff87f5d",
+    "fabric-transitive-access-wideners-v1@8.1.17+e2f63d3e5d",
+    "fabricloader@0.20.1",
+    "mixinextras@0.5.5"
+  ]
+}

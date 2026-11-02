@@ -1,0 +1,4 @@
+{
+  "section": "SectionPos{x\u003d-26, y\u003d3, z\u003d-25}",
+  "difference": "cutout: quad differs, native [(9.0 15.0 14.25 rgba\u003dffcccccc uv\u003d0.3359375,0.625 light\u003d00c80000)(9.0 14.0 14.25 rgba\u003dff666666 uv\u003d0.3359375,0.6328125 light\u003d00c00000)(10.0 14.0 14.25 rgba\u003dff999999 uv\u003d0.34375,0.6328125 light\u003d00c00000)(10.0 15.0 14.25 rgba\u003dffffffff uv\u003d0.34375,0.625 light\u003d00c80000)] vanilla [(9.0 15.0 14.25 rgba\u003dffa3a3a3 uv\u003d0.3359375,0.625 light\u003d00c80000)(9.0 14.0 14.25 rgba\u003dff515151 uv\u003d0.3359375,0.6328125 light\u003d00c00000)(10.0 14.0 14.25 rgba\u003dff7a7a7a uv\u003d0.34375,0.6328125 light\u003d00c00000)(10.0 15.0 14.25 rgba\u003dffcccccc uv\u003d0.34375,0.625 light\u003d00c80000)]"
+}

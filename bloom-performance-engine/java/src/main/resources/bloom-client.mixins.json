@@ -1,0 +1,18 @@
+{
+	"required": true,
+	"package": "com.bloomclient.client.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"ClientLanguageMixin",
+		"GuiMixin",
+		"HudMixin",
+		"InventoryScreenOverlayMixin",
+		"KeyboardHandlerMixin",
+		"MinecraftClientMixin",
+		"OptionsMixin",
+		"PackRepositoryMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

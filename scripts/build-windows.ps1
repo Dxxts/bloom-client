@@ -31,7 +31,8 @@ Step "Rust tests" { cargo test --manifest-path src-tauri/Cargo.toml }
 Step "Bloom Native World Engine (Rust + Fabric mod)" {
     & "$PSScriptRoot\..\bloom-performance-engine\scripts\build-native.ps1"
     New-Item -ItemType Directory -Force src-tauri\resources\engine | Out-Null
-    Copy-Item bloom-performance-engine\java\build\libs\bloom-engine-0.1.0.jar src-tauri\resources\engine\bloom-engine.jar -Force
+    $jar = Get-ChildItem bloom-performance-engine\java\build\libs\bloom-engine-*.jar | Where-Object Name -notmatch "sources" | Sort-Object LastWriteTime | Select-Object -Last 1
+    Copy-Item $jar.FullName src-tauri\resources\engine\bloom-engine.jar -Force
 }
 
 if ($Release) {

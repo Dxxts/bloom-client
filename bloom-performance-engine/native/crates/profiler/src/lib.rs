@@ -122,6 +122,8 @@ pub struct EngineProfiler {
     pub culled_faces: AtomicU64,
     pub vertex_bytes: AtomicU64,
     pub models_registered: AtomicU64,
+    pub native_fluids: AtomicU64,
+    pub demoted_fluids: AtomicU64,
     /// Time inside `meshSection`, in nanoseconds.
     pub mesh_ns: Histogram,
 }
@@ -139,6 +141,8 @@ impl EngineProfiler {
             &self.quads,
             &self.culled_faces,
             &self.vertex_bytes,
+            &self.native_fluids,
+            &self.demoted_fluids,
         ] {
             c.store(0, Ordering::Relaxed);
         }
@@ -164,8 +168,8 @@ impl EngineProfiler {
             s.p95,
             s.p99,
             s.max,
-            0,
-            0,
+            l(&self.native_fluids),
+            l(&self.demoted_fluids),
         ]
     }
 }

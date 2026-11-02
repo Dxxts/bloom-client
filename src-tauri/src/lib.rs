@@ -64,6 +64,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     )?;
     state.paths().ensure()?;
     app.manage(state);
+    engine::refresh_compat_db_in_background(&handle);
 
     services::tray::init(&handle)?;
 

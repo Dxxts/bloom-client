@@ -36,7 +36,10 @@ loom {
 			property 'bloom.benchmark', project.findProperty('bench.scene') ?: 'world'
 			property 'bloom.benchmark.duration', project.findProperty('bench.duration') ?: '30'
 			property 'bloom.engine.enabled', project.findProperty('bench.engine') ?: 'true'
-			property 'bloom.engine.validateEvery', '0'
+			property 'bloom.engine.validateEvery', project.findProperty('bench.validate') ?: '0'
+			property 'bloom.engine.nativeFluids', project.findProperty('bench.fluids') ?: 'true'
+			property 'bloom.benchmark.screenshot', project.findProperty('bench.screenshot') ?: 'true'
+			property 'bloom.indigo.requireNoFixes', project.findProperty('bench.indigoFixes') ?: 'false'
 			programArgs '--quickPlaySingleplayer', project.findProperty('bench.world') ?: 'New World'
 		}
 	}
@@ -51,6 +54,11 @@ processResources {
 	inputs.property 'version', version
 	filesMatching('fabric.mod.json') {
 		expand 'version': version
+	}
+	// Signed compatibility database (see compat-db/ and scripts/CompatDbTool.java).
+	from('../compat-db') {
+		include 'bloom-compat-db.json', 'bloom-compat-db.json.sig'
+		into 'bloom'
 	}
 	if (nativeLib.exists()) {
 		from(nativeLib) {

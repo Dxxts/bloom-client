@@ -5,7 +5,7 @@ use rusqlite::{params, OptionalExtension, Row};
 
 use super::{now_ts, Db};
 use crate::errors::{BloomError, BloomResult};
-use crate::models::{EngineKind, JavaRuntime, LaunchRecord, LoaderKind, Settings};
+use crate::models::{EngineKind, EngineOptions, JavaRuntime, LaunchRecord, LoaderKind, Settings};
 
 // ---------------------------------------------------------------------------
 // Settings
@@ -224,6 +224,7 @@ pub struct InstanceRow {
     pub loader: LoaderKind,
     pub loader_version: Option<String>,
     pub engine: EngineKind,
+    pub engine_options: EngineOptions,
     pub java_path: Option<String>,
     pub min_ram_mb: Option<u32>,
     pub max_ram_mb: Option<u32>,
@@ -238,7 +239,7 @@ pub struct InstanceRow {
 }
 
 const INSTANCE_COLS: &str = "id, name, version_id, loader, loader_version, java_path, min_ram_mb, max_ram_mb,
-    resolution_width, resolution_height, fullscreen, jvm_args, icon, created_at, last_played_at, total_play_seconds, engine";
+    resolution_width, resolution_height, fullscreen, jvm_args, icon, created_at, last_played_at, total_play_seconds, engine, engine_options";
 
 fn instance_from_row(r: &Row) -> rusqlite::Result<InstanceRow> {
     let loader: String = r.get(3)?;
@@ -260,6 +261,8 @@ fn instance_from_row(r: &Row) -> rusqlite::Result<InstanceRow> {
         last_played_at: r.get(14)?,
         total_play_seconds: r.get(15)?,
         engine: EngineKind::parse(&r.get::<_, String>(16)?).unwrap_or_default(),
+        // Unreadable or missing options fall back to the defaults.
+        engine_options: r.get::<_, Option<String>>(17)?.and_then(|s| serde_json::from_str(&s).ok()).unwrap_or_default(),
     })
 }
 
@@ -282,11 +285,12 @@ impl Db {
 
     pub fn insert_instance(&self, i: &InstanceRow) -> BloomResult<()> {
         self.conn().execute(
-            &format!("INSERT INTO instances ({INSTANCE_COLS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17)"),
+            &format!("INSERT INTO instances ({INSTANCE_COLS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18)"),
             params![
                 i.id, i.name, i.version_id, i.loader.as_str(), i.loader_version, i.java_path, i.min_ram_mb,
                 i.max_ram_mb, i.resolution_width, i.resolution_height, i.fullscreen.map(i64::from), i.jvm_args,
-                i.icon, i.created_at, i.last_played_at, i.total_play_seconds, i.engine.as_str()
+                i.icon, i.created_at, i.last_played_at, i.total_play_seconds, i.engine.as_str(),
+                serde_json::to_string(&i.engine_options)?
             ],
         )?;
         Ok(())
@@ -296,11 +300,11 @@ impl Db {
         let n = self.conn().execute(
             "UPDATE instances SET name = ?2, version_id = ?3, loader = ?4, loader_version = ?5, java_path = ?6,
                min_ram_mb = ?7, max_ram_mb = ?8, resolution_width = ?9, resolution_height = ?10, fullscreen = ?11,
-               jvm_args = ?12, icon = ?13, engine = ?14 WHERE id = ?1",
+               jvm_args = ?12, icon = ?13, engine = ?14, engine_options = ?15 WHERE id = ?1",
             params![
                 i.id, i.name, i.version_id, i.loader.as_str(), i.loader_version, i.java_path, i.min_ram_mb,
                 i.max_ram_mb, i.resolution_width, i.resolution_height, i.fullscreen.map(i64::from), i.jvm_args, i.icon,
-                i.engine.as_str()
+                i.engine.as_str(), serde_json::to_string(&i.engine_options)?
             ],
         )?;
         if n == 0 {

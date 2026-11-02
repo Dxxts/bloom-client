@@ -3,6 +3,7 @@ package com.bloomclient.engine.mesh;
 import com.bloomclient.engine.BloomEngine;
 import com.bloomclient.engine.bridge.NativeBridge;
 import com.bloomclient.engine.bridge.Protocol;
+import com.bloomclient.engine.compatibility.FabricApiAdapter;
 import com.bloomclient.engine.access.BloomBlockState;
 import com.bloomclient.engine.access.BloomBufferBuilder;
 import com.bloomclient.engine.mixin.VisibilitySetAccessor;
@@ -14,6 +15,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.function.Function;
 import net.minecraft.client.color.block.BlockTintSource;
+import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.block.dispatch.SingleVariant;
@@ -22,11 +24,13 @@ import net.minecraft.client.renderer.chunk.RenderSectionRegion;
 import net.minecraft.client.renderer.chunk.VisibilitySet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.system.MemoryUtil;
@@ -35,9 +39,10 @@ import org.lwjgl.system.MemoryUtil;
  * Native meshing of one section, owned by one worker thread.
  *
  * <p>{@link #prepare} snapshots the section and runs the native mesher once.
- * During the vanilla loop that follows, {@link #handledNatively} tells the
- * compiler which blocks to skip, and {@link #appendTo} copies the native
- * vertices into vanilla's buffers before they are built.
+ * During the vanilla loop that follows, {@link #handledNatively} and
+ * {@link #fluidHandledNatively} tell the compiler which block models and
+ * fluids to skip, and {@link #appendTo} copies the native vertices into
+ * vanilla's buffers before they are built.
  */
 public final class SectionMesher {
 	private static final ThreadLocal<SectionMesher> CURRENT = ThreadLocal.withInitial(SectionMesher::new);
@@ -46,9 +51,10 @@ public final class SectionMesher {
 	private long context;
 	private final long snapshot = MemoryUtil.nmemAlloc(Protocol.SNAPSHOT_MAX_SIZE);
 	private final long result = MemoryUtil.nmemAlloc(Protocol.RESULT_SIZE);
-	private final long lightMask = MemoryUtil.nmemAlloc(Protocol.LIGHT_MASK_BYTES);
+	private final long plan = MemoryUtil.nmemAlloc(Protocol.PLAN_SIZE);
 	private final BlockState[] center = new BlockState[4096];
 	private final boolean[] handled = new boolean[4096];
+	private final boolean[] handledFluid = new boolean[4096];
 	private final List<BlockStateModelPart> parts = new ArrayList<>(4);
 	private final IdentityHashMap<BlockStateModelPart, Integer> singlePartIds = new IdentityHashMap<>();
 	private final RandomSource random = RandomSource.createThreadLocalInstance(0L);
@@ -94,11 +100,15 @@ public final class SectionMesher {
 			}
 		}
 		long started = System.nanoTime();
-		int size = writeSnapshot(t, sectionPos, region, ambientOcclusion, cutoutLeaves);
+		boolean fluids = BloomEngine.config().nativeFluids;
+		int size = writeSnapshot(t, sectionPos, region, ambientOcclusion, cutoutLeaves, fluids);
 		// Light is read only where the mesher needs it (blocks with a visible face).
-		int status = NativeBridge.planLight(context, snapshot, size, lightMask);
+		int status = NativeBridge.planLight(context, snapshot, size, plan);
 		if (status == Protocol.STATUS_OK) {
 			writeLight(sectionPos, region);
+			if (fluids) {
+				size = writeFluids(t, sectionPos, region, size);
+			}
 		}
 		long snapshotDone = System.nanoTime();
 		if (status == Protocol.STATUS_OK) {
@@ -115,22 +125,30 @@ public final class SectionMesher {
 		int demoted = MemoryUtil.memGetInt(result + 4);
 		long demotedPtr = MemoryUtil.memGetLong(result + 8);
 		for (int i = 0; i < demoted; i++) {
-			handled[MemoryUtil.memGetShort(demotedPtr + i * 2L) & 0xFFFF] = false;
+			int entry = MemoryUtil.memGetShort(demotedPtr + i * 2L) & 0xFFFF;
+			if ((entry & Protocol.DEMOTED_FLUID_BIT) != 0) {
+				handledFluid[entry & 0xFFF] = false;
+			} else {
+				handled[entry] = false;
+			}
 		}
 		active = true;
 		EngineProfiler.recordNativeSection(snapshotDone - started, meshDone - snapshotDone,
-				MemoryUtil.memGetInt(result + 72), demoted);
+				MemoryUtil.memGetInt(result + 72), MemoryUtil.memGetInt(result + 84), MemoryUtil.memGetInt(result + 96),
+				MemoryUtil.memGetInt(result + 100));
 		return true;
 	}
 
-	private int writeSnapshot(BlockStateTables t, SectionPos sectionPos, RenderSectionRegion region, boolean ao, boolean cutoutLeaves) {
+	private int writeSnapshot(BlockStateTables t, SectionPos sectionPos, RenderSectionRegion region, boolean ao, boolean cutoutLeaves,
+			boolean fluids) {
 		long s = snapshot;
 		int ox = sectionPos.minBlockX();
 		int oy = sectionPos.minBlockY();
 		int oz = sectionPos.minBlockZ();
 		MemoryUtil.memPutInt(s, Protocol.SNAPSHOT_MAGIC);
 		MemoryUtil.memPutShort(s + 4, (short) Protocol.VERSION);
-		MemoryUtil.memPutShort(s + 6, (short) ((ao ? Protocol.FLAG_AMBIENT_OCCLUSION : 0) | (cutoutLeaves ? Protocol.FLAG_CUTOUT_LEAVES : 0)));
+		MemoryUtil.memPutShort(s + 6, (short) ((ao ? Protocol.FLAG_AMBIENT_OCCLUSION : 0) | (cutoutLeaves ? Protocol.FLAG_CUTOUT_LEAVES : 0)
+				| (fluids ? Protocol.FLAG_NATIVE_FLUIDS : 0)));
 		MemoryUtil.memPutInt(s + 8, t.epoch());
 		MemoryUtil.memPutInt(s + 20, sectionPos.x());
 		MemoryUtil.memPutInt(s + 24, sectionPos.y());
@@ -142,6 +160,8 @@ public final class SectionMesher {
 		MemoryUtil.memPutFloat(s + 44, light.south());
 		MemoryUtil.memPutFloat(s + 48, light.west());
 		MemoryUtil.memPutFloat(s + 52, light.east());
+		// Fluid entries are added after the plan (writeFluids).
+		MemoryUtil.memPutInt(s + Protocol.SNAPSHOT_FLUID_COUNT_OFFSET, 0);
 
 		long states = s + Protocol.SNAPSHOT_STATES_OFFSET;
 		int i = 0;
@@ -167,6 +187,7 @@ public final class SectionMesher {
 		for (int index = 0; index < 4096; index++) {
 			BlockState state = center[index];
 			int id = ((BloomBlockState) state).bloom$stateId();
+			handledFluid[index] = fluids && t.isNativeFluid(id);
 			int model;
 			if (state.isAir() || state.getRenderShape() != RenderShape.MODEL) {
 				model = Protocol.MODEL_NONE;
@@ -189,12 +210,13 @@ public final class SectionMesher {
 						tintCount++;
 					}
 					if (state.hasOffsetFunction()) {
+						// The entry carries the origin, in the arithmetic of the renderer Bloom matches.
 						Vec3 offset = state.getOffset(pos);
 						long e = offsetScratch + (long) offsetCount * Protocol.OFFSET_ENTRY_SIZE;
 						MemoryUtil.memPutShort(e, (short) index);
-						MemoryUtil.memPutFloat(e + 4, (float) offset.x);
-						MemoryUtil.memPutFloat(e + 8, (float) offset.y);
-						MemoryUtil.memPutFloat(e + 12, (float) offset.z);
+						MemoryUtil.memPutFloat(e + 4, FabricApiAdapter.origin((float) x, offset.x));
+						MemoryUtil.memPutFloat(e + 8, FabricApiAdapter.origin((float) y, offset.y));
+						MemoryUtil.memPutFloat(e + 12, FabricApiAdapter.origin((float) z, offset.z));
 						offsetCount++;
 					}
 				}
@@ -211,6 +233,81 @@ public final class SectionMesher {
 		return Protocol.SNAPSHOT_TABLES_OFFSET + tintCount * Protocol.TINT_ENTRY_SIZE + offsetCount * Protocol.OFFSET_ENTRY_SIZE;
 	}
 
+	/**
+	 * Appends the fluid entries the plan asked for: the tint, and the flow
+	 * terms of {@code FluidRenderer} for fluids whose top face is drawn.
+	 * Returns the new snapshot size.
+	 */
+	private int writeFluids(BlockStateTables t, SectionPos sectionPos, RenderSectionRegion region, int size) {
+		int requests = MemoryUtil.memGetInt(plan + Protocol.PLAN_FLUID_COUNT_OFFSET);
+		int ox = sectionPos.minBlockX();
+		int oy = sectionPos.minBlockY();
+		int oz = sectionPos.minBlockZ();
+		for (int i = 0; i < requests; i++) {
+			int request = MemoryUtil.memGetShort(plan + Protocol.PLAN_FLUIDS_OFFSET + i * 2L) & 0xFFFF;
+			int index = request & 0xFFF;
+			BlockState state = center[index];
+			FluidState fluid = state.getFluidState();
+			pos.set(ox + (index & 15), oy + (index >> 8), oz + (index >> 4 & 15));
+			FluidModel model = t.fluids().get(fluid);
+			int tint = model.tintSource() != null ? model.tintSource().colorInWorld(state, region, pos) : -1;
+			int flags = 0;
+			float s = 0.0F;
+			float c = 0.0F;
+			if ((request & Protocol.PLAN_FLUID_NEEDS_FLOW) != 0) {
+				flags |= Protocol.FLUID_ENTRY_FLOW_KNOWN;
+				Vec3 flow = fluid.getFlow(region, pos);
+				if (!(flow.x == 0.0 && flow.z == 0.0)) {
+					// Same expressions as FluidRenderer.tesselate.
+					float angle = (float) Mth.atan2(flow.z, flow.x) - ((float) Math.PI / 2F);
+					s = Mth.sin((double) angle) * 0.25F;
+					c = Mth.cos((double) angle) * 0.25F;
+					flags |= Protocol.FLUID_ENTRY_HAS_FLOW;
+				}
+			}
+			long e = snapshot + size + (long) i * Protocol.FLUID_ENTRY_SIZE;
+			MemoryUtil.memPutShort(e, (short) index);
+			MemoryUtil.memPutByte(e + 2, (byte) flags);
+			MemoryUtil.memPutByte(e + 3, (byte) 0);
+			MemoryUtil.memPutInt(e + 4, tint);
+			MemoryUtil.memPutFloat(e + 8, s);
+			MemoryUtil.memPutFloat(e + 12, c);
+		}
+		MemoryUtil.memPutInt(snapshot + Protocol.SNAPSHOT_FLUID_COUNT_OFFSET, requests);
+		return size + requests * Protocol.FLUID_ENTRY_SIZE;
+	}
+
+	/**
+	 * Whether any light value the last native mesh read has changed since.
+	 * Light comes from the live light engine, not from the section copy, so
+	 * a light update between the native mesh and a later vanilla compile of
+	 * the same section makes them differ legitimately.
+	 */
+	public boolean lightChanged(SectionPos sectionPos, RenderSectionRegion region) {
+		int ox = sectionPos.minBlockX();
+		int oy = sectionPos.minBlockY();
+		int oz = sectionPos.minBlockZ();
+		long lightBase = snapshot + Protocol.SNAPSHOT_LIGHT_OFFSET;
+		int dim = Protocol.LIGHT_DIM;
+		int total = dim * dim * dim;
+		for (int byteIndex = 0; byteIndex < Protocol.LIGHT_MASK_BYTES; byteIndex++) {
+			int bits = MemoryUtil.memGetByte(plan + byteIndex) & 0xFF;
+			while (bits != 0) {
+				int i = byteIndex * 8 + Integer.numberOfTrailingZeros(bits);
+				bits &= bits - 1;
+				if (i >= total) {
+					break;
+				}
+				pos.set(ox + i % dim + Protocol.LIGHT_MIN, oy + i / (dim * dim) + Protocol.LIGHT_MIN, oz + i / dim % dim + Protocol.LIGHT_MIN);
+				int now = region.getBrightness(LightLayer.SKY, pos) << 4 | region.getBrightness(LightLayer.BLOCK, pos);
+				if ((MemoryUtil.memGetByte(lightBase + i) & 0xFF) != now) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	/** Fills the light bytes selected by the native light plan. */
 	private void writeLight(SectionPos sectionPos, RenderSectionRegion region) {
 		int ox = sectionPos.minBlockX();
@@ -220,7 +317,7 @@ public final class SectionMesher {
 		int dim = Protocol.LIGHT_DIM;
 		int total = dim * dim * dim;
 		for (int byteIndex = 0; byteIndex < Protocol.LIGHT_MASK_BYTES; byteIndex++) {
-			int bits = MemoryUtil.memGetByte(lightMask + byteIndex) & 0xFF;
+			int bits = MemoryUtil.memGetByte(plan + byteIndex) & 0xFF;
 			while (bits != 0) {
 				int i = byteIndex * 8 + Integer.numberOfTrailingZeros(bits);
 				bits &= bits - 1;
@@ -265,6 +362,11 @@ public final class SectionMesher {
 	/** Whether the block at section-relative {@code (x, y, z)} was meshed natively. */
 	public boolean handledNatively(float x, float y, float z) {
 		return active && handled[(int) x | (int) z << 4 | (int) y << 8];
+	}
+
+	/** Whether the fluid at {@code pos} (any position inside the section) was meshed natively. */
+	public boolean fluidHandledNatively(BlockPos pos) {
+		return active && handledFluid[(pos.getX() & 15) | (pos.getZ() & 15) << 4 | (pos.getY() & 15) << 8];
 	}
 
 	public VisibilitySet visibility() {

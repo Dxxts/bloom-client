@@ -156,6 +156,30 @@ impl EngineKind {
     }
 }
 
+/// Per-instance settings of the Bloom Native World Engine, chosen in the
+/// instance editor and passed to the game as `-Dbloom.engine.*` properties
+/// (which take precedence over `config/bloom-engine.json`).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct EngineOptions {
+    /// Native meshing on; `false` keeps the instance on Fabric with the vanilla renderer.
+    pub enabled: bool,
+    /// Water and lava meshed natively.
+    pub native_fluids: bool,
+    /// Compare one section in N with the vanilla renderer (0 = off). Costs frame time.
+    pub validate_every: u32,
+    /// Keep the engine on with mods whose terrain hooks were not verified.
+    pub allow_unverified: bool,
+    /// GPU for the Vulkan backend of Minecraft: index or part of the name (empty = automatic).
+    pub vulkan_device: String,
+}
+
+impl Default for EngineOptions {
+    fn default() -> Self {
+        Self { enabled: true, native_fluids: true, validate_every: 0, allow_unverified: false, vulkan_device: String::new() }
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Instance {
@@ -165,6 +189,7 @@ pub struct Instance {
     pub loader: LoaderKind,
     pub loader_version: Option<String>,
     pub engine: EngineKind,
+    pub engine_options: EngineOptions,
     pub java_path: Option<String>,
     pub min_ram_mb: Option<u32>,
     pub max_ram_mb: Option<u32>,
@@ -192,6 +217,8 @@ pub struct InstanceInput {
     pub loader_version: Option<String>,
     #[serde(default)]
     pub engine: EngineKind,
+    #[serde(default)]
+    pub engine_options: EngineOptions,
     pub java_path: Option<String>,
     pub min_ram_mb: Option<u32>,
     pub max_ram_mb: Option<u32>,

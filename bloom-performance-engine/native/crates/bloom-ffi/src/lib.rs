@@ -22,7 +22,9 @@ use std::sync::{Arc, OnceLock, RwLock};
 use std::time::Instant;
 
 use bloom_core::model::{Model, ModelError};
-use bloom_core::protocol::{status, Writer, LAYER_COUNT, PROTOCOL_VERSION, RESULT_SIZE};
+use bloom_core::protocol::{
+    status, Writer, LAYER_COUNT, PLAN_FLUIDS_OFFSET, PLAN_FLUID_COUNT_OFFSET, PLAN_SIZE, PROTOCOL_VERSION, RESULT_SIZE,
+};
 use bloom_core::state::StateTable;
 use chunk_mesher::{MeshError, Mesher, LIGHT_MASK_BYTES};
 use profiler::{EngineProfiler, EXPORT_SLOTS};
@@ -172,7 +174,8 @@ pub extern "system" fn Java_com_bloomclient_engine_bridge_NativeBridge_destroyCo
 }
 
 /// First pass over a snapshot whose light array is not filled yet: writes
-/// the `LIGHT_MASK_BYTES` bitmask of light positions Java must read.
+/// the plan (`PLAN_SIZE` bytes): the bitmask of light positions Java must
+/// read, then the fluid blocks Java must describe.
 #[no_mangle]
 pub extern "system" fn Java_com_bloomclient_engine_bridge_NativeBridge_planLight(
     _: JEnv,
@@ -200,8 +203,19 @@ pub extern "system" fn Java_com_bloomclient_engine_bridge_NativeBridge_planLight
         let models = engine.models.read().unwrap_or_else(|e| e.into_inner());
         match context.mesher.plan_light(bytes, &engine.states, models.as_slice()) {
             Ok(mask) => {
-                // SAFETY: Java provides LIGHT_MASK_BYTES writable bytes.
-                unsafe { std::ptr::copy_nonoverlapping(mask.as_ptr(), mask_addr as usize as *mut u8, LIGHT_MASK_BYTES) };
+                let out = mask_addr as usize as *mut u8;
+                // SAFETY: Java provides PLAN_SIZE writable bytes.
+                unsafe { std::ptr::copy_nonoverlapping(mask.as_ptr(), out, LIGHT_MASK_BYTES) };
+                let requests = context.mesher.fluid_requests();
+                debug_assert!(PLAN_FLUIDS_OFFSET + requests.len() * 2 <= PLAN_SIZE);
+                // SAFETY: as above; at most SECTION_VOLUME requests fit by construction.
+                unsafe {
+                    (out.add(PLAN_FLUID_COUNT_OFFSET) as *mut u32).write_unaligned(requests.len() as u32);
+                    let dst = out.add(PLAN_FLUIDS_OFFSET) as *mut u16;
+                    for (i, r) in requests.iter().enumerate() {
+                        dst.add(i).write_unaligned(*r);
+                    }
+                }
                 status::OK
             }
             Err(MeshError::StaleEpoch) => status::STALE_TABLES,
@@ -292,12 +306,16 @@ fn mesh_into(context: &mut Context, snapshot_addr: i64, snapshot_len: i32, resul
     w.put_u32(80, m.stats.culled_faces);
     w.put_u32(84, m.stats.demoted_blocks);
     w.put_u64(88, elapsed);
+    w.put_u32(96, m.stats.native_fluids);
+    w.put_u32(100, m.stats.demoted_fluids);
     // SAFETY: Java provides RESULT_SIZE writable bytes.
     unsafe { std::ptr::copy_nonoverlapping(w.bytes.as_ptr(), result_addr as usize as *mut u8, RESULT_SIZE) };
 
     let p = profiler();
     p.sections_meshed.fetch_add(1, Ordering::Relaxed);
     p.native_blocks.fetch_add(m.stats.native_blocks as u64, Ordering::Relaxed);
+    p.native_fluids.fetch_add(m.stats.native_fluids as u64, Ordering::Relaxed);
+    p.demoted_fluids.fetch_add(m.stats.demoted_fluids as u64, Ordering::Relaxed);
     p.demoted_blocks.fetch_add(m.stats.demoted_blocks as u64, Ordering::Relaxed);
     p.quads.fetch_add(m.stats.quads as u64, Ordering::Relaxed);
     p.culled_faces.fetch_add(m.stats.culled_faces as u64, Ordering::Relaxed);
@@ -373,7 +391,7 @@ mod tests {
     fn end_to_end_through_the_jni_surface() {
         let null = std::ptr::null_mut();
         let air = StateInfo { flags: state_flags::AIR | state_flags::LIGHT_PERMEABLE, ..StateInfo::UNKNOWN };
-        let air = StateInfo { face_classes: 0, face_shapes: [NO_SHAPE; 6], block_id: 0, ..air };
+        let air = StateInfo { face_classes: 0, face_shapes: [NO_SHAPE; 6], block_id: 0, fluid_group: 0, ..air };
         let stone = StateInfo {
             flags: state_flags::SOLID_RENDER | state_flags::COLLISION_FULL_BLOCK,
             block_id: 1,
@@ -382,6 +400,9 @@ mod tests {
             skip_rule: 0,
             face_classes: (0..6).fold(0, |a, d| a | ((face_class::BLOCK as u16) << (d * 2))),
             face_shapes: [NO_SHAPE; 6],
+            fluid_group: 0,
+            fluid_model: 0,
+            fluid_amount: 0,
         };
         let table = encode_state_table(9, &[air, stone]);
         let st = Java_com_bloomclient_engine_bridge_NativeBridge_installTables(null, null, table.as_ptr() as i64, table.len() as i32, 0, 0);

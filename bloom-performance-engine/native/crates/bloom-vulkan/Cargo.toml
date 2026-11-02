@@ -1,0 +1,25 @@
+[package]
+name = "bloom-vulkan"
+description = "Bloom's own Vulkan backend (experimental, outside the game): device selection, memory, pipelines, swapchain, diagnostics."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+# The rest of the workspace has no external dependencies. This crate needs
+# Vulkan bindings (ash, loading vulkan-1.dll at runtime), a GLSL -> SPIR-V
+# compiler written in Rust (naga, no C++ toolchain) and Win32 for the
+# presentation window. None of them is linked into bloom_native.dll.
+[dependencies]
+ash = { version = "0.38", default-features = false, features = ["loaded", "debug", "std"] }
+# naga 30.0.1: glsl-in uses a module that is only compiled with spv-in or wgsl-in.
+naga = { version = "30", features = ["glsl-in", "spv-out", "wgsl-in"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_System_LibraryLoader",
+    "Win32_UI_WindowsAndMessaging",
+] }

@@ -1,0 +1,11 @@
+{
+  "tool": "bloom-bench",
+  "cpuThreads": 12,
+  "runs": 5,
+  "scenes": [
+    {"scene": "natural_terrain", "sections": 1024, "snapshotBytes": 55480, "quads": 396166, "nativeBlocks": 1096370, "nativeFluids": 6217, "demoted": 0, "vertexBytes": 44370592, "singleThreadMedianUs": 13.20, "singleThreadP95Us": 402.90, "singleThreadMeanUs": 142.68, "planPlusMeshMeanUs": 198.38, "singleThreadSectionsPerS": 7009, "parallelThreads": 11, "parallelSectionsPerS": 40370, "allocsPerSectionReusedContext": 0.000, "allocsPerSectionFreshContext": 13.279},
+    {"scene": "large_builds", "sections": 1024, "snapshotBytes": 54280, "quads": 1065537, "nativeBlocks": 357219, "nativeFluids": 0, "demoted": 0, "vertexBytes": 119340144, "singleThreadMedianUs": 28.10, "singleThreadP95Us": 601.00, "singleThreadMeanUs": 223.76, "planPlusMeshMeanUs": 256.18, "singleThreadSectionsPerS": 4469, "parallelThreads": 11, "parallelSectionsPerS": 26476, "allocsPerSectionReusedContext": 0.000, "allocsPerSectionFreshContext": 15.914},
+    {"scene": "transparent_blocks", "sections": 1024, "snapshotBytes": 75789, "quads": 12952267, "nativeBlocks": 1834760, "nativeFluids": 458875, "demoted": 0, "vertexBytes": 1450653904, "singleThreadMedianUs": 2262.20, "singleThreadP95Us": 2670.40, "singleThreadMeanUs": 1812.92, "planPlusMeshMeanUs": 2014.73, "singleThreadSectionsPerS": 552, "parallelThreads": 11, "parallelSectionsPerS": 3163, "allocsPerSectionReusedContext": 0.000, "allocsPerSectionFreshContext": 43.401},
+    {"scene": "ocean", "sections": 1024, "snapshotBytes": 55304, "quads": 219350, "nativeBlocks": 377311, "nativeFluids": 1654305, "demoted": 0, "vertexBytes": 24567200, "singleThreadMedianUs": 94.60, "singleThreadP95Us": 245.30, "singleThreadMeanUs": 94.49, "planPlusMeshMeanUs": 157.88, "singleThreadSectionsPerS": 10583, "parallelThreads": 11, "parallelSectionsPerS": 63006, "allocsPerSectionReusedContext": 0.000, "allocsPerSectionFreshContext": 9.728}
+  ]
+}

@@ -67,6 +67,25 @@ export type LoaderKind = "vanilla" | "fabric" | "forge" | "neoforge";
 export type EngineKind = "java" | "rust";
 export type InstallState = "installed" | "not_installed" | "incomplete";
 
+/** Bloom Native World Engine settings of one instance (passed to the game at launch). */
+export interface EngineOptions {
+  enabled: boolean;
+  nativeFluids: boolean;
+  /** Compare one section in N with the vanilla renderer; 0 = off. */
+  validateEvery: number;
+  allowUnverified: boolean;
+  /** GPU for the Vulkan backend: index or part of the name; empty = automatic. */
+  vulkanDevice: string;
+}
+
+export const DEFAULT_ENGINE_OPTIONS: EngineOptions = {
+  enabled: true,
+  nativeFluids: true,
+  validateEvery: 0,
+  allowUnverified: false,
+  vulkanDevice: "",
+};
+
 export interface Instance {
   id: string;
   name: string;
@@ -74,6 +93,7 @@ export interface Instance {
   loader: LoaderKind;
   loaderVersion: string | null;
   engine: EngineKind;
+  engineOptions: EngineOptions;
   javaPath: string | null;
   minRamMb: number | null;
   maxRamMb: number | null;
@@ -95,6 +115,7 @@ export interface InstanceInput {
   loader: LoaderKind;
   loaderVersion: string | null;
   engine: EngineKind;
+  engineOptions: EngineOptions;
   javaPath: string | null;
   minRamMb: number | null;
   maxRamMb: number | null;

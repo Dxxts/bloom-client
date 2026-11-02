@@ -8,14 +8,20 @@
 | AO liscia e luce piatta (`BlockModelLighter`, tutte le tabelle `AdjacencyInfo`/`AmbientVertexRemap`) | **Rust** | `chunk-mesher/src/ao.rs`, `lib.rs` |
 | Colore, tinta, emissione, `CardinalLighting`, matematica `ARGB`/`LightCoordsUtil` | **Rust** | `bloom-core` |
 | Generazione dei vertici nel formato `BLOCK` (28 byte), separazione SOLID/CUTOUT/TRANSLUCENT, foglie forzate a SOLID | **Rust** | `chunk-mesher` |
+| **Fluidi** (port di `FluidRenderer`: facce, altezze, angoli, overlay, luce, UV del flusso) — M03 | **Rust** | `chunk-mesher/src/fluid.rs` |
 | Occlusion culling tra le facce della sezione (`VisGraph` → `VisibilitySet`) | **Rust** | `culling/visgraph.rs` |
 | Piano di lettura della luce (solo l'intorno dei blocchi con facce visibili) | **Rust** | `Mesher::plan_light` |
 | Statistiche native (istogramma dei tempi, contatori) | **Rust** | `profiler` |
 | Scheduler con priorità dinamica, deduplicazione, cancellazione, generazioni | **Rust** | `world-processing` (benchmark offline) |
 | Frustum e distance culling | **Rust** | `culling/frustum.rs` (benchmark, renderer futuro) |
-| Snapshot del mondo: stati, luce, scelta delle varianti, tinte per bioma, offset | Java | `SectionMesher` |
-| Classificazione degli stati (nativo o fallback, con motivo) | Java | `BlockStateTables` |
-| Fluidi, block entity, blocchi con modelli non verificati | Java (vanilla) | invariati |
+| Snapshot del mondo: stati, luce, scelta delle varianti, tinte per bioma, origini dei blocchi con offset, tinta e flusso dei fluidi | Java | `SectionMesher` |
+| Classificazione degli stati e dei fluidi (nativo o fallback, con motivo) | Java | `BlockStateTables` |
+| Block entity, blocchi con modelli non verificati o geometrie dinamiche, fluidi delle mod | Java (vanilla) | invariati |
+| Entità, block entity, particelle (estrazione, animazioni, submit) | Java (vanilla), **misurati** | `LevelExtractorMixin`, `LevelRendererMixin` |
+| Compatibility layer, database firmato, adapter Fabric API, rilevamento shader | Java | `compatibility/` |
+| F3 proprietario, timer GPU, draw call, VRAM | Java | `diagnostics/`, `profiling/` |
+| Selezione del device Vulkan di Minecraft | Java | `vulkan/`, `VulkanBackendMixin` |
+| Backend Vulkan proprietario (sperimentale, fuori dal gioco) | **Rust** | `bloom-vulkan`, `bloom-gpu-bench` |
 | Ordinamento traslucido, upload GPU, draw (OpenGL **e** Vulkan di `renderpearl`) | Java (vanilla) | invariati |
 | Scheduling in-game dei task di compilazione | Java (vanilla) | `SectionTaskDynamicQueue` |
 | Profiling di frame e compilazioni, benchmark, validatore, analizzatore di compatibilità | Java | `profiling`, `benchmark`, `validation`, `compatibility` |
@@ -25,12 +31,12 @@
 ```
 worker vanilla ── SectionCompiler.compile ──────────────────────────────────────
   HEAD   SectionMesher.prepare
-           Java: stati 20³ + modelli/tinte/offset 16³ ──► snapshot off-heap
-           JNI planLight ──► Rust: maschera delle posizioni di luce necessarie
-           Java: luce solo dove serve
-           JNI meshSection ──► Rust: culling, AO, luce, vertici, VisGraph
-  loop vanilla: fluidi, block entity, blocchi Java/fallback
-                (@WrapOperation salta i blocchi già fatti in Rust)
+           Java: stati 20³ + modelli/tinte/origini 16³ ──► snapshot off-heap
+           JNI planLight ──► Rust: maschera della luce + fluidi visibili
+           Java: luce solo dove serve; tinta e flusso dei fluidi richiesti
+           JNI meshSection ──► Rust: culling, AO, luce, vertici, fluidi, VisGraph
+  loop vanilla: block entity, blocchi e fluidi Java/fallback
+                (@WrapOperation salta i modelli e i fluidi già fatti in Rust)
   VisGraph.resolve ──► VisibilitySet calcolato in Rust
   prima di build(): memCopy dei vertici Rust nei BufferBuilder vanilla
   RETURN: profiler, eventuale validazione contro vanilla
@@ -41,16 +47,12 @@ upload / sort / draw: vanilla, su OpenGL o Vulkan (renderpearl)
 Una sola chiamata JNI di meshing per sezione (più `planLight`), mai per
 blocco o per faccia.
 
-## Perché niente backend Vulkan proprietario in questa milestone
+## Vulkan
 
-Minecraft 26.3 ha già un backend Vulkan nativo (`renderpearl/backend/vulkan`),
-selezionabile con `preferredGraphicsBackend:vulkan` e con fallback automatico
-su OpenGL. Un `VkDevice` creato da Rust non potrebbe condividere buffer e
-sincronizzazione con quello di Minecraft senza un'interoperabilità esplicita.
-Producendo i dati nel formato di `renderpearl`, il mesher Rust funziona con
-**entrambi** i backend senza codice aggiuntivo. Un renderer nativo completo,
-con device proprio, va affrontato come milestone separata insieme alla
-gestione dell'intero frame (entità, GUI, post-processing).
+In gioco Bloom usa il backend Vulkan di Minecraft (`renderpearl`) e ne
+gestisce la scelta del device, la diagnostica e le misure; il backend
+Vulkan proprietario di Bloom esiste come crate separato e sperimentale, non
+collegato al gioco. Motivi e stato in [VULKAN.md](VULKAN.md).
 
 ## Perché niente greedy meshing
 
@@ -92,20 +94,28 @@ sprite), che romperebbero resource pack e shader pack. Non è stato applicato.
 
 ```
 bloom-performance-engine/
-  docs/        ANALISI_TECNICA, ARCHITETTURA, PROTOCOLLO, COMPATIBILITA, BENCHMARK
-  native/      workspace Cargo (zero dipendenze esterne)
-    crates/bloom-core       protocollo, tabelle, port esatti di colore e luce, pool
-    crates/chunk-mesher     mesher, AO, piano della luce, test
+  docs/        M03_ANALISI, M03_STATO, ANALISI_TECNICA, ARCHITETTURA, PROTOCOLLO,
+               COMPATIBILITA, DATABASE, VULKAN, DIAGNOSTICA, BENCHMARK
+  compat-db/   database di compatibilità firmato (json, .sig, index.json)
+  native/      workspace Cargo
+    crates/bloom-core       protocollo, tabelle (anche fluidi), port esatti di colore e luce, pool
+    crates/chunk-mesher     mesher, AO, fluidi, piano della luce, test
     crates/culling          VisGraph, frustum, distance culling
     crates/world-processing scheduler parallelo con priorità
     crates/profiler         contatori e istogrammi lock-free
-    crates/bloom-ffi        libreria JNI bloom_native
-    crates/bloom-bench      benchmark offline ripetibile
+    crates/bloom-ffi        libreria JNI bloom_native (zero dipendenze esterne)
+    crates/bloom-bench      scene sintetiche + benchmark CPU ripetibile
+    crates/bloom-vulkan     backend Vulkan sperimentale (ash, naga, windows-sys)
+    crates/bloom-gpu-bench  benchmark GPU del backend sperimentale
   java/        mod Fabric (Loom 1.19, MC 26.3, Java 25)
-    bridge/ mesh/ mixin/ access/ compatibility/ profiling/ validation/ benchmark/
-  benchmarks/results/  risultati JSON
-  scripts/     build-native.ps1, run-benchmark.ps1
+    bridge/ mesh/ mixin/ access/ compatibility/ diagnostics/ profiling/
+    validation/ vulkan/ benchmark/        test JUnit in src/test
+  benchmarks/  results/ (JSON), compat/ (prove di compatibilità con log e F3)
+  scripts/     build-native.ps1, run-benchmark.ps1, run-compat-test.sh, CompatDbTool.java
 ```
+
+Le dipendenze esterne riguardano solo i crate Vulkan: la DLL caricata dal
+gioco (`bloom-ffi` e ciò che usa) resta senza dipendenze esterne.
 
 Forge e NeoForge non sono integrati: il loader reale del progetto e
 l'unico con toolchain stabile per 26.3 è Fabric.

@@ -1,0 +1,263 @@
+{
+  "scene": "world",
+  "minecraft": "26.3",
+  "engine": "ACTIVE",
+  "engineReason": "active",
+  "renderDistance": 16,
+  "graphicsBackendOption": "VULKAN",
+  "cpuThreads": 12,
+  "maxHeapMb": 4080,
+  "remeshAllSectionsMs": 534.4234,
+  "remeshTimedOut": false,
+  "remesh": {
+    "engineStatus": "ACTIVE",
+    "engineReason": "active",
+    "compileNativeMs": {
+      "count": 724,
+      "mean": 4.484464364640884,
+      "p50": 3.2562,
+      "p95": 10.5106,
+      "p99": 39.6681,
+      "max": 109.4494,
+      "totalMs": 3246.7522
+    },
+    "compileVanillaMs": {
+      "count": 0
+    },
+    "snapshotMs": {
+      "count": 724,
+      "mean": 3.002903038674033,
+      "p50": 2.1949,
+      "p95": 6.8829,
+      "p99": 23.6259,
+      "max": 108.4809,
+      "totalMs": 2174.1018
+    },
+    "nativeMeshMs": {
+      "count": 724,
+      "mean": 0.8739899171270719,
+      "p50": 0.5605,
+      "p95": 1.0446,
+      "p99": 8.1718,
+      "max": 40.7824,
+      "totalMs": 632.7687
+    },
+    "nativeBlocks": 1542023,
+    "demotedBlocks": 158,
+    "nativeFluids": 199111,
+    "demotedFluids": 0,
+    "frames": {
+      "count": 122,
+      "avgFps": 247.93321248282757,
+      "onePercentLowFps": 38.43064613445346,
+      "frameTimeMs": {
+        "p50": 3.2474,
+        "max": 26.0209,
+        "p99": 10.9249
+      },
+      "mainThreadWorkMsP50": 3.213,
+      "stutters": 0
+    },
+    "render": {
+      "frames": 123,
+      "stagesPerFrame": {
+        "extract_entities": {
+          "maxMs": 0.4459,
+          "meanMs": 0.17723821138211385
+        },
+        "extract_block_entities": {
+          "maxMs": 0.1009,
+          "meanMs": 0.03630487804878049
+        },
+        "extract_particles": {
+          "maxMs": 0.1139,
+          "meanMs": 0.06154471544715447
+        },
+        "submit_entities": {
+          "maxMs": 0.106,
+          "meanMs": 0.023322764227642276
+        },
+        "submit_block_entities": {
+          "maxMs": 0.0028,
+          "meanMs": 3.609756097560976E-4
+        },
+        "submit_particles": {
+          "maxMs": 0.0155,
+          "meanMs": 0.005200813008130081
+        },
+        "prepare_features": {
+          "maxMs": 0.4805,
+          "meanMs": 0.170569918699187
+        },
+        "execute_frame_graph": {
+          "maxMs": 1.4665,
+          "meanMs": 0.3106747967479675
+        }
+      },
+      "drawCallsPerFrame": 35.479674796747965,
+      "drawsPerFrame": 589.9430894308944,
+      "entitiesPerFrame": 3.430894308943089,
+      "blockEntitiesPerFrame": 0.0
+    },
+    "gpuFrame": {
+      "samples": 123,
+      "meanMs": 4.160814308943091,
+      "maxMs": 42.466368
+    },
+    "validatedSections": 0,
+    "validationSkippedLightChanged": 0,
+    "heapUsedMb": 1027,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.7115108923779493,
+    "native": {
+      "sectionsMeshed": 724,
+      "sectionsRejected": 0,
+      "nativeBlocks": 1542023,
+      "demotedBlocks": 158,
+      "quads": 674026,
+      "culledFaces": 8623769,
+      "vertexBytes": 75468512,
+      "modelsRegistered": 185,
+      "meshCount": 724,
+      "meshMeanNs": 867140,
+      "meshP50Ns": 589823,
+      "meshP95Ns": 1048575,
+      "meshP99Ns": 8388607,
+      "meshMaxNs": 40779700,
+      "nativeFluids": 199111,
+      "demotedFluids": 0
+    }
+  },
+  "rotate": {
+    "engineStatus": "ACTIVE",
+    "engineReason": "active",
+    "compileNativeMs": {
+      "count": 1597,
+      "mean": 3.2860562930494677,
+      "p50": 3.0151,
+      "p95": 6.7657,
+      "p99": 10.528,
+      "max": 23.7834,
+      "totalMs": 5247.8319
+    },
+    "compileVanillaMs": {
+      "count": 0
+    },
+    "snapshotMs": {
+      "count": 1597,
+      "mean": 2.207016092673763,
+      "p50": 1.9992,
+      "p95": 5.1553,
+      "p99": 8.4141,
+      "max": 22.5145,
+      "totalMs": 3524.6047
+    },
+    "nativeMeshMs": {
+      "count": 1597,
+      "mean": 0.5756440200375705,
+      "p50": 0.5447,
+      "p95": 0.9283,
+      "p99": 1.5102,
+      "max": 11.3007,
+      "totalMs": 919.3035
+    },
+    "nativeBlocks": 3435041,
+    "demotedBlocks": 326,
+    "nativeFluids": 1204236,
+    "demotedFluids": 106,
+    "frames": {
+      "count": 10133,
+      "avgFps": 338.65789798160927,
+      "onePercentLowFps": 88.61017916890496,
+      "frameTimeMs": {
+        "p50": 2.6475,
+        "max": 71.7662,
+        "p99": 7.4444
+      },
+      "mainThreadWorkMsP50": 2.6172,
+      "stutters": 4
+    },
+    "render": {
+      "frames": 10134,
+      "stagesPerFrame": {
+        "extract_entities": {
+          "maxMs": 39.6321,
+          "meanMs": 0.16662876455496348
+        },
+        "extract_block_entities": {
+          "maxMs": 0.9301,
+          "meanMs": 0.07251272942569569
+        },
+        "extract_particles": {
+          "maxMs": 0.7683,
+          "meanMs": 0.04843559305308861
+        },
+        "submit_entities": {
+          "maxMs": 4.1233,
+          "meanMs": 0.05245820011841326
+        },
+        "submit_block_entities": {
+          "maxMs": 0.0944,
+          "meanMs": 4.429149398065917E-4
+        },
+        "submit_particles": {
+          "maxMs": 0.2256,
+          "meanMs": 0.0031675942372212354
+        },
+        "prepare_features": {
+          "maxMs": 64.7082,
+          "meanMs": 0.25206760410499307
+        },
+        "execute_frame_graph": {
+          "maxMs": 1.4111,
+          "meanMs": 0.19357813301756463
+        }
+      },
+      "drawCallsPerFrame": 31.573712255772648,
+      "drawsPerFrame": 1632.041839352674,
+      "entitiesPerFrame": 13.891158476416026,
+      "blockEntitiesPerFrame": 0.0
+    },
+    "gpuFrame": {
+      "samples": 10134,
+      "meanMs": 2.963417514110915,
+      "maxMs": 80.920576
+    },
+    "validatedSections": 0,
+    "validationSkippedLightChanged": 0,
+    "heapUsedMb": 1643,
+    "heapMaxMb": 4080,
+    "processCpuLoad": 0.0891577336377056,
+    "native": {
+      "sectionsMeshed": 1597,
+      "sectionsRejected": 0,
+      "nativeBlocks": 3435041,
+      "demotedBlocks": 326,
+      "quads": 1654046,
+      "culledFaces": 19169248,
+      "vertexBytes": 185195696,
+      "modelsRegistered": 211,
+      "meshCount": 1597,
+      "meshMeanNs": 571749,
+      "meshP50Ns": 589823,
+      "meshP95Ns": 983039,
+      "meshP99Ns": 1572863,
+      "meshMaxNs": 11297900,
+      "nativeFluids": 1204236,
+      "demotedFluids": 106
+    }
+  },
+  "vram": {
+    "totalMiB": 4943,
+    "source": "Vulkan VMA budget (device-local heaps)",
+    "usedMiB": 576
+  },
+  "gpuDevice": "NVIDIA GeForce GTX 1660 SUPER",
+  "gpuBackend": "Vulkan",
+  "nativeFluids": true,
+  "mods": [
+    "bloom-engine@0.2.0",
+    "fabricloader@0.20.1",
+    "mixinextras@0.5.5"
+  ]
+}

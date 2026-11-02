@@ -91,4 +91,8 @@ pub const MIGRATIONS: &[&str] = &[
     r#"
     ALTER TABLE instances ADD COLUMN engine TEXT NOT NULL DEFAULT 'java';
     "#,
+    // v3: Bloom engine options per instance (JSON of models::EngineOptions; NULL = defaults)
+    r#"
+    ALTER TABLE instances ADD COLUMN engine_options TEXT;
+    "#,
 ];

@@ -106,7 +106,7 @@ async fn run(app: &AppHandle, state: &AppState, instance_id: &str, cancel: Cance
     let game_dir = state.paths().instance_dir(instance_id)?;
     let mut command = build_command(state, &settings, &instance, &plan, &auth, java_path, java_major, &game_dir).await?;
     hooks::apply_all(&mut command)?;
-    crate::engine::apply(app, instance.engine, &mut command)?;
+    crate::engine::apply(app, instance.engine, &instance.engine_options, &mut command)?;
 
     // 5. Spawn and monitor
     process::spawn_and_monitor(app, state, command, &instance, &auth, cancel).await

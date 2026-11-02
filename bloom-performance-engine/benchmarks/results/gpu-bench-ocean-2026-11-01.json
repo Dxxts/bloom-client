@@ -1,0 +1,24 @@
+{
+  "tool": "bloom-gpu-bench",
+  "device": "NVIDIA GeForce GTX 1660 SUPER",
+  "scene": "ocean",
+  "sections": 1024,
+  "quads": 219350,
+  "vertices": 877400,
+  "extent": [1920, 1080],
+  "present": false,
+  "vsync": false,
+  "validationLayer": false,
+  "validationWarnings": 0,
+  "validationErrors": 0,
+  "cpuMeshMs": 1059.2,
+  "uploadMs": 55.1,
+  "uploadedBytes": 24606112,
+  "bloomMemoryUsedMiB": 40,
+  "deviceLocalUsageMiB": 211,
+  "shaderCompileMs": 0.66,
+  "modes": [
+    {"mode": "Direct", "frames": 600, "drawCallsPerFrame": 512, "drawsPerFrame": 512, "gpuMsMean": 0.2798, "gpuMsP50": 0.2535, "gpuMsP99": 0.5756, "cpuRecordMsMean": 0.0276, "frameMsMean": 0.2894},
+    {"mode": "MultiDrawIndirect", "frames": 600, "drawCallsPerFrame": 1, "drawsPerFrame": 512, "gpuMsMean": 0.2758, "gpuMsP50": 0.2516, "gpuMsP99": 0.5807, "cpuRecordMsMean": 0.0109, "frameMsMean": 0.2877}
+  ]
+}

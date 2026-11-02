@@ -1,16 +1,17 @@
 package com.bloomclient.engine.bridge;
 
-/** Mirror of {@code bloom_core::protocol} (version 1). Keep both in sync. */
+/** Mirror of {@code bloom_core::protocol} (version 2). Keep both in sync. */
 public final class Protocol {
 	private Protocol() {
 	}
 
-	public static final int VERSION = 1;
+	public static final int VERSION = 2;
 
 	public static final int SNAPSHOT_MAGIC = magic("BLMS");
 	public static final int STATE_TABLE_MAGIC = magic("BLST");
 	public static final int SHAPE_PAIRS_MAGIC = magic("BLSP");
 	public static final int MODEL_MAGIC = magic("BLMD");
+	public static final int FLUID_MODELS_MAGIC = magic("BLFM");
 
 	public static final int STATE_DIM = 20;
 	public static final int STATE_MIN = -2;
@@ -25,16 +26,26 @@ public final class Protocol {
 	public static final int TINT_ENTRY_SIZE = 16;
 	public static final int MAX_TINTS = 3;
 	public static final int OFFSET_ENTRY_SIZE = 16;
-	/** Largest possible snapshot: every block has a tint and an offset entry. */
-	public static final int SNAPSHOT_MAX_SIZE = SNAPSHOT_TABLES_OFFSET + 4096 * (TINT_ENTRY_SIZE + OFFSET_ENTRY_SIZE);
+	public static final int SNAPSHOT_FLUID_COUNT_OFFSET = 56;
+	public static final int FLUID_ENTRY_SIZE = 16;
+	public static final int FLUID_ENTRY_HAS_FLOW = 1;
+	public static final int FLUID_ENTRY_FLOW_KNOWN = 2;
+	/** Largest possible snapshot: every block has a tint, an offset and a fluid entry. */
+	public static final int SNAPSHOT_MAX_SIZE = SNAPSHOT_TABLES_OFFSET + 4096 * (TINT_ENTRY_SIZE + OFFSET_ENTRY_SIZE + FLUID_ENTRY_SIZE);
 
 	public static final int FLAG_AMBIENT_OCCLUSION = 1;
 	public static final int FLAG_CUTOUT_LEAVES = 1 << 1;
+	public static final int FLAG_NATIVE_FLUIDS = 1 << 2;
 
 	public static final int MODEL_NONE = 0;
 	public static final int MODEL_JAVA = -1;
 
 	public static final int LIGHT_MASK_BYTES = (LIGHT_DIM * LIGHT_DIM * LIGHT_DIM + 7) / 8;
+	public static final int PLAN_FLUID_COUNT_OFFSET = 736;
+	public static final int PLAN_FLUIDS_OFFSET = 740;
+	public static final int PLAN_FLUID_NEEDS_FLOW = 0x8000;
+	public static final int PLAN_SIZE = PLAN_FLUIDS_OFFSET + 4096 * 2;
+	public static final int DEMOTED_FLUID_BIT = 0x8000;
 
 	public static final int RESULT_SIZE = 128;
 	public static final int LAYER_COUNT = 3;
@@ -57,6 +68,14 @@ public final class Protocol {
 	public static final int STATE_DYNAMIC = 1 << 5;
 	public static final int STATE_LEAVES = 1 << 6;
 	public static final int STATE_TINTED = 1 << 7;
+	public static final int STATE_SOLID = 1 << 8;
+	public static final int STATE_OVERLAY_NEIGHBOR = 1 << 9;
+
+	public static final int FLUID_GROUP_NONE = 0;
+	public static final int FLUID_GROUP_UNVERIFIED = 255;
+	public static final int FLUID_MODEL_RECORD_SIZE = 64;
+	public static final int FLUID_MODEL_TINTED = 1;
+	public static final int FLUID_MODEL_HAS_OVERLAY = 2;
 
 	public static final int SKIP_NONE = 0;
 	public static final int SKIP_SAME_BLOCK = 1;

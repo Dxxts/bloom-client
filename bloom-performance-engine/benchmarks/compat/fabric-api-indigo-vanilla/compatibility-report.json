@@ -1,0 +1,959 @@
+{
+  "engineStatus": "ACTIVE: active",
+  "database": "bundled (sequence 1, 4 entries)",
+  "databaseProblems": [],
+  "mods": [
+    {
+      "id": "fabric-recipe-api-v1",
+      "version": "10.0.11+b9b88df45d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-renderer-indigo",
+      "version": "9.1.25+b9d63e335d",
+      "verdict": "UNVERIFIED_TERRAIN_HOOKS",
+      "mode": "NATIVE_ADAPTER",
+      "modeSource": "USER_OVERRIDE",
+      "reasons": [
+        "set by the user in config/bloom-engine.json"
+      ],
+      "renderMixinTargets": [
+        "net.minecraft.client.renderer.block.BlockModelLighter"
+      ],
+      "renderTransformations": [
+        "net.minecraft.client.renderer.feature.ItemFeatureRenderer"
+      ],
+      "renderApis": [
+        "render types / transparency",
+        "terrain layers"
+      ],
+      "rendererDependencies": [
+        "fabric-renderer-api-v1 (depends)"
+      ],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-transitive-access-wideners-v1",
+      "version": "8.1.17+e2f63d3e5d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-api",
+      "version": "0.165.0+26.3",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "databaseStatus": "UNTESTED",
+      "knownIssues": [],
+      "vulkan": "UNTESTED",
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-data-attachment-api-v1",
+      "version": "2.2.33+b9b88df45d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-registry-sync-v0",
+      "version": "8.0.4+1ca9f6365d",
+      "verdict": "RENDERS_OUTSIDE_TERRAIN",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [
+        "net.minecraft.client.particle.ParticleResources"
+      ],
+      "renderApis": [
+        "custom render pipelines",
+        "renderpearl"
+      ],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-sound-api-v1",
+      "version": "2.0.7+3434d6d95d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-renderer-api-v1",
+      "version": "17.0.17+79385d0b5d",
+      "verdict": "UNVERIFIED_TERRAIN_HOOKS",
+      "mode": "NATIVE_ADAPTER",
+      "modeSource": "USER_OVERRIDE",
+      "reasons": [
+        "set by the user in config/bloom-engine.json"
+      ],
+      "renderMixinTargets": [
+        "net.minecraft.client.renderer.block.BlockStateModelSet",
+        "net.minecraft.client.renderer.chunk.SectionCompiler"
+      ],
+      "renderTransformations": [
+        "net.minecraft.client.particle.BlockMarker",
+        "net.minecraft.client.particle.TerrainParticle",
+        "net.minecraft.client.renderer.LevelRenderer",
+        "net.minecraft.client.renderer.OrderedSubmitNodeCollector",
+        "net.minecraft.client.renderer.SubmitNodeCollection",
+        "net.minecraft.client.renderer.SubmitNodeStorage",
+        "net.minecraft.client.renderer.block.BlockModelRenderState",
+        "net.minecraft.client.renderer.block.dispatch.BlockStateModel",
+        "net.minecraft.client.renderer.block.dispatch.BlockStateModelPart",
+        "net.minecraft.client.renderer.block.dispatch.SingleVariant",
+        "net.minecraft.client.renderer.block.dispatch.WeightedVariants",
+        "net.minecraft.client.renderer.block.dispatch.multipart.MultiPartModel",
+        "net.minecraft.client.renderer.block.dispatch.multipart.MultiPartModel$SharedBakedState",
+        "net.minecraft.client.renderer.block.model.BlockStateModelWrapper",
+        "net.minecraft.client.renderer.extract.LevelExtractor",
+        "net.minecraft.client.renderer.feature.MovingBlockFeatureRenderer",
+        "net.minecraft.client.renderer.item.CuboidItemModelWrapper",
+        "net.minecraft.client.renderer.item.ItemStackRenderState",
+        "net.minecraft.client.renderer.item.ItemStackRenderState$LayerRenderState",
+        "net.minecraft.client.renderer.texture.SpriteLoader$Preparations",
+        "net.minecraft.client.renderer.texture.TextureAtlas"
+      ],
+      "renderApis": [
+        "render types / transparency",
+        "terrain layers"
+      ],
+      "rendererDependencies": [],
+      "customBlockModels": 4,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-game-rule-api-v1",
+      "version": "4.0.10+3434d6d95d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-transfer-api-v1",
+      "version": "8.0.25+fcdff87f5d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-data-generation-api-v1",
+      "version": "27.4.2+187b64905d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-lifecycle-events-v1",
+      "version": "4.1.9+ffef5f675d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-dimensions-v1",
+      "version": "5.1.20+5af7744b5d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-networking-api-v1",
+      "version": "6.4.0+a21c9eb65d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-resource-conditions-api-v1",
+      "version": "6.2.0+0d124ae85d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-particles-v1",
+      "version": "5.0.27+3434d6d95d",
+      "verdict": "RENDERS_OUTSIDE_TERRAIN",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [
+        "net.minecraft.client.particle.ParticleEngine",
+        "net.minecraft.client.particle.ParticleResources",
+        "net.minecraft.client.particle.TerrainParticle"
+      ],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-api-lookup-api-v1",
+      "version": "2.0.24+3434d6d95d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-resource-loader-v1",
+      "version": "3.1.0+5af7744b5d",
+      "verdict": "RENDERS_OUTSIDE_TERRAIN",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [
+        "net.minecraft.client.particle.ParticleResources",
+        "net.minecraft.client.renderer.CloudRenderer",
+        "net.minecraft.client.renderer.GpuWarnlistManager",
+        "net.minecraft.client.renderer.ShaderManager",
+        "net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher",
+        "net.minecraft.client.renderer.entity.EntityRenderDispatcher",
+        "net.minecraft.client.renderer.extract.LevelExtractor",
+        "net.minecraft.client.renderer.texture.TextureManager"
+      ],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-loot-api-v3",
+      "version": "4.0.9+4068fd645d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-permission-api-v1",
+      "version": "1.0.8+fcdff87f5d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-debug-api-v1",
+      "version": "1.0.5+5af7744b5d",
+      "verdict": "RENDERS_OUTSIDE_TERRAIN",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [
+        "net.minecraft.client.renderer.debug.DebugRenderer"
+      ],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-menu-api-v1",
+      "version": "2.0.30+ed66f0a35d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-rendering-fluids-v1",
+      "version": "6.0.6+3434d6d95d",
+      "verdict": "UNVERIFIED_TERRAIN_HOOKS",
+      "mode": "NATIVE_ADAPTER",
+      "modeSource": "USER_OVERRIDE",
+      "reasons": [
+        "set by the user in config/bloom-engine.json"
+      ],
+      "renderMixinTargets": [
+        "net.minecraft.client.renderer.block.FluidRenderer",
+        "net.minecraft.client.renderer.block.FluidStateModelSet"
+      ],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-block-getter-api-v2",
+      "version": "2.0.9+3434d6d95d",
+      "verdict": "RENDERS_OUTSIDE_TERRAIN",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [
+        "net.minecraft.client.renderer.block.MovingBlockRenderState",
+        "net.minecraft.client.renderer.chunk.RenderRegionCache",
+        "net.minecraft.client.renderer.chunk.RenderSectionRegion"
+      ],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-advancement-api-v1",
+      "version": "1.0.1+38c7a2d55d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-tag-api-v1",
+      "version": "2.1.11+fcdff87f5d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-object-builder-api-v1",
+      "version": "24.1.12+e2f63d3e5d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-screen-api-v1",
+      "version": "5.2.4+48607d035d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-biome-api-v1",
+      "version": "20.1.1+85210bca5d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-resource-loader-v0",
+      "version": "3.3.27+4fc5413f5d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-convention-tags-v2",
+      "version": "4.10.5+187b64905d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-rendering-v1",
+      "version": "27.2.0+eb9fe70b5d",
+      "verdict": "UNVERIFIED_TERRAIN_HOOKS",
+      "mode": "NATIVE_ADAPTER",
+      "modeSource": "USER_OVERRIDE",
+      "reasons": [
+        "set by the user in config/bloom-engine.json"
+      ],
+      "renderMixinTargets": [
+        "net.minecraft.client.renderer.block.ModelBlockRenderer"
+      ],
+      "renderTransformations": [
+        "com.mojang.renderpearl.api.pipeline.RenderPipeline",
+        "com.mojang.renderpearl.api.pipeline.RenderPipeline$Builder",
+        "com.mojang.renderpearl.api.pipeline.RenderPipeline$Snippet",
+        "net.minecraft.client.renderer.GameRenderer",
+        "net.minecraft.client.renderer.LevelRenderer",
+        "net.minecraft.client.renderer.StagedVertexBuffer$Draw",
+        "net.minecraft.client.renderer.SubmitNodeCollection",
+        "net.minecraft.client.renderer.SubmitNodeStorage",
+        "net.minecraft.client.renderer.block.BlockModelRenderState",
+        "net.minecraft.client.renderer.block.BuiltInBlockModels",
+        "net.minecraft.client.renderer.block.MovingBlockRenderState",
+        "net.minecraft.client.renderer.blockentity.BlockEntityRenderers",
+        "net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState",
+        "net.minecraft.client.renderer.entity.EntityRenderDispatcher",
+        "net.minecraft.client.renderer.entity.EntityRenderers",
+        "net.minecraft.client.renderer.entity.HumanoidMobRenderer",
+        "net.minecraft.client.renderer.entity.LivingEntityRenderer",
+        "net.minecraft.client.renderer.entity.layers.CapeLayer",
+        "net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer",
+        "net.minecraft.client.renderer.entity.state.EntityRenderState",
+        "net.minecraft.client.renderer.entity.state.EntityRenderState$LeashState",
+        "net.minecraft.client.renderer.extract.LevelExtractor",
+        "net.minecraft.client.renderer.feature.FeatureRenderDispatcher",
+        "net.minecraft.client.renderer.fog.FogData",
+        "net.minecraft.client.renderer.item.ItemStackRenderState",
+        "net.minecraft.client.renderer.item.ItemStackRenderState$LayerRenderState",
+        "net.minecraft.client.renderer.state.GameRenderState",
+        "net.minecraft.client.renderer.state.LightmapRenderState",
+        "net.minecraft.client.renderer.state.MapRenderState",
+        "net.minecraft.client.renderer.state.MapRenderState$MapDecorationRenderState",
+        "net.minecraft.client.renderer.state.OptionsRenderState",
+        "net.minecraft.client.renderer.state.WindowRenderState",
+        "net.minecraft.client.renderer.state.gui.GuiRenderState",
+        "net.minecraft.client.renderer.state.gui.PanoramaRenderState",
+        "net.minecraft.client.renderer.state.level.BlockBreakingRenderState",
+        "net.minecraft.client.renderer.state.level.BlockOutlineRenderState",
+        "net.minecraft.client.renderer.state.level.CameraEntityRenderState",
+        "net.minecraft.client.renderer.state.level.CameraRenderState",
+        "net.minecraft.client.renderer.state.level.FirstPersonHandsAndItemsRenderState",
+        "net.minecraft.client.renderer.state.level.LevelRenderState",
+        "net.minecraft.client.renderer.state.level.ParticlesRenderState",
+        "net.minecraft.client.renderer.state.level.PlayerRenderState",
+        "net.minecraft.client.renderer.state.level.PlayerRenderState$ItemActivationRenderState",
+        "net.minecraft.client.renderer.state.level.SkyRenderState",
+        "net.minecraft.client.renderer.state.level.WeatherRenderState",
+        "net.minecraft.client.renderer.state.level.WorldBorderRenderState",
+        "net.minecraft.client.renderer.texture.atlas.SpriteSources"
+      ],
+      "renderApis": [
+        "block entity renderer",
+        "custom GPU buffers",
+        "custom render pipelines",
+        "custom vertex format",
+        "entity renderer",
+        "render types / transparency",
+        "renderpearl",
+        "terrain layers"
+      ],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-events-interaction-v0",
+      "version": "5.3.9+b9b88df45d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-crash-report-info-v1",
+      "version": "1.0.7+fcdff87f5d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-model-loading-api-v1",
+      "version": "8.0.37+fcdff87f5d",
+      "verdict": "RENDERS_OUTSIDE_TERRAIN",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [
+        "net.minecraft.client.renderer.block.dispatch.BlockStateModel$Unbaked"
+      ],
+      "renderApis": [],
+      "rendererDependencies": [
+        "fabric-renderer-api-v1 (depends)"
+      ],
+      "customBlockModels": 2,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-content-registries-v0",
+      "version": "15.0.6+74ed1ea55d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-command-api-v2",
+      "version": "3.1.2+fcdff87f5d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-api-base",
+      "version": "2.0.6+fcdff87f5d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-key-mapping-api-v1",
+      "version": "2.0.8+3434d6d95d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-block-api-v1",
+      "version": "3.1.0+0ae6f9115d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-creative-tab-api-v1",
+      "version": "5.0.22+fcdff87f5d",
+      "verdict": "RENDERS_OUTSIDE_TERRAIN",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [
+        "custom render pipelines",
+        "renderpearl"
+      ],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-item-api-v1",
+      "version": "14.8.0+d1c0d72b5d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-message-api-v1",
+      "version": "7.0.10+3434d6d95d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-serialization-api-v1",
+      "version": "2.0.7+74ed1ea55d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    },
+    {
+      "id": "fabric-entity-events-v1",
+      "version": "6.0.4+3434d6d95d",
+      "verdict": "NO_RENDER_HOOKS",
+      "mode": "AUTOMATIC_ADAPTER",
+      "modeSource": "ANALYSIS",
+      "reasons": [
+        "not in the database: static analysis only"
+      ],
+      "renderMixinTargets": [],
+      "renderTransformations": [],
+      "renderApis": [],
+      "rendererDependencies": [],
+      "customBlockModels": 0,
+      "shipsShaders": false,
+      "knownIssues": [],
+      "databaseTests": 0
+    }
+  ],
+  "fallbackStates": {
+    "CUSTOM_SKIP_RENDERING": 835,
+    "NATIVE": 34616,
+    "NOT_A_MODEL": 86,
+    "POSITION_DEPENDENT_SHADE": 186
+  },
+  "shaders": {
+    "coreShaderOverrides": "none (vanilla)",
+    "iris": "not installed",
+    "resourceReloads": "1"
+  },
+  "classScanComplete": true
+}

@@ -3,13 +3,18 @@ package com.bloomclient.engine;
 import com.bloomclient.engine.bridge.NativeBridge;
 import com.bloomclient.engine.bridge.NativeLibrary;
 import com.bloomclient.engine.compatibility.CompatibilityAnalyzer;
+import com.bloomclient.engine.compatibility.CompatibilityDatabase;
+import com.bloomclient.engine.compatibility.CompatibilityLayer;
 import com.bloomclient.engine.compatibility.CompatibilityReport;
+import com.bloomclient.engine.compatibility.ShaderCompatibility;
 import com.bloomclient.engine.mesh.BlockStateTables;
 import com.bloomclient.engine.profiling.EngineProfiler;
 import java.nio.file.Path;
+import java.util.Set;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.renderer.block.BlockStateModelSet;
+import net.minecraft.client.renderer.block.FluidStateModelSet;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +46,9 @@ public final class BloomEngine {
 	private static EngineConfig config = new EngineConfig();
 	private static Path dataDir = Path.of(".bloom");
 	private static @Nullable CompatibilityReport compatibility;
+	private static CompatibilityDatabase database = CompatibilityDatabase.empty("not loaded");
+	private static CompatibilityLayer.Decisions decisions = new CompatibilityLayer.Decisions(Set.of(), Set.of());
+	private static Path reportFile = Path.of(".bloom", "compatibility-report.json");
 
 	private BloomEngine() {
 	}
@@ -49,8 +57,21 @@ public final class BloomEngine {
 		Path gameDir = FabricLoader.getInstance().getGameDir();
 		dataDir = gameDir.resolve(".bloom");
 		config = EngineConfig.load(FabricLoader.getInstance().getConfigDir().resolve("bloom-engine.json"));
-		compatibility = CompatibilityAnalyzer.analyze(dataDir.resolve("compatibility-report.json"));
 		EngineProfiler.init(dataDir, config.statsIntervalSeconds);
+		reportFile = dataDir.resolve("compatibility-report.json");
+		String minecraft = FabricLoader.getInstance().getModContainer("minecraft").map(m -> m.getMetadata().getVersion().getFriendlyString()).orElse("?");
+		String downloaded = System.getProperty("bloom.compatDb");
+		database = CompatibilityDatabase.load(downloaded == null || downloaded.isBlank() ? null : Path.of(downloaded));
+		compatibility = CompatibilityAnalyzer.analyze();
+		decisions = CompatibilityLayer.resolve(compatibility, database, config.modModes, config.allowUnverified, minecraft);
+		CompatibilityLayer.applyAdapters(decisions.adapterClasses());
+		compatibility.database = database.source() + " (sequence " + database.sequence() + ", " + database.size() + " entries)";
+		compatibility.databaseProblems = database.problems();
+		for (String problem : database.problems()) {
+			LOGGER.warn("Bloom Engine: compatibility database: {}", problem);
+		}
+		ShaderCompatibility.detectMods(compatibility);
+		CompatibilityAnalyzer.scanInBackground(reportFile, compatibility);
 
 		if (!config.enabled) {
 			setOff("disabled in config/bloom-engine.json");
@@ -71,12 +92,26 @@ public final class BloomEngine {
 		status = Status.ACTIVE;
 		reason = "active";
 		LOGGER.info("Bloom Engine: native chunk mesher active");
+		writeReport();
 	}
 
 	private static void setOff(String why) {
 		status = Status.OFF;
 		reason = why;
 		LOGGER.info("Bloom Engine: off ({}), using the vanilla renderer", why);
+		writeReport();
+	}
+
+	private static void writeReport() {
+		CompatibilityReport report = compatibility;
+		if (report != null) {
+			report.engineStatus = status + ": " + reason;
+			CompatibilityAnalyzer.write(reportFile, report);
+		}
+	}
+
+	public static CompatibilityDatabase database() {
+		return database;
 	}
 
 	public static boolean active() {
@@ -112,16 +147,32 @@ public final class BloomEngine {
 	 * reload, graphics option change). Rebuilds the native tables for the new
 	 * baked models; snapshots built for the old tables are rejected natively.
 	 */
-	public static synchronized void onCompilerCreated(BlockStateModelSet models, BlockColors colors) {
+	public static synchronized void onCompilerCreated(BlockStateModelSet models, FluidStateModelSet fluids, BlockColors colors) {
+		if (compatibility != null) {
+			try {
+				ShaderCompatibility.onResourcesReloaded(net.minecraft.client.Minecraft.getInstance().getResourceManager(), compatibility);
+			} catch (RuntimeException e) {
+				LOGGER.debug("Bloom Engine: shader detection failed", e);
+			}
+		}
 		if (status != Status.ACTIVE) {
 			return;
 		}
 		BlockStateTables current = tables;
-		if (current != null && current.isFor(models, colors)) {
+		if (current != null && current.isFor(models, fluids, colors)) {
 			return;
 		}
 		try {
-			tables = BlockStateTables.build(models, colors, current == null ? 1 : current.epoch() + 1);
+			BlockStateTables built = BlockStateTables.build(models, fluids, colors, current == null ? 1 : current.epoch() + 1, decisions.fallbackNamespaces());
+			tables = built;
+			if (compatibility != null) {
+				CompatibilityLayer.applyStates(compatibility, built.namespaces());
+				synchronized (compatibility) {
+					compatibility.fallbackStates.clear();
+					built.fallbackCounts().forEach((k, v) -> compatibility.fallbackStates.put(k.name(), v));
+				}
+				writeReport();
+			}
 		} catch (Throwable t) {
 			fail("building native tables", t);
 		}
@@ -141,6 +192,8 @@ public final class BloomEngine {
 		}
 		reason = where + (nativeError.isEmpty() ? "" : ": " + nativeError);
 		LOGGER.error("Bloom Engine: disabled after an error while {}; sections are compiled by the vanilla renderer from now on", reason, error);
+		RenderingErrors.record(reason);
+		writeReport();
 		tables = null;
 		try {
 			NativeBridge.shutdown();

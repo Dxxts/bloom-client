@@ -2,15 +2,23 @@
 	"schemaVersion": 1,
 	"id": "bloom-engine",
 	"version": "${version}",
-	"name": "Bloom Native World Engine",
-	"description": "Native (Rust) chunk meshing for Bloom Client, with a verified vanilla fallback.",
-	"authors": ["Bloom Client"],
+	"name": "Bloom Client",
+	"description": "Bloom Client in game: native (Rust) chunk meshing with a verified vanilla fallback, Bloom Menu, HUD Studio and Bloom mods.",
+	"authors": [
+		"Bloom Client"
+	],
 	"license": "Proprietary",
 	"environment": "client",
 	"entrypoints": {
-		"client": ["com.bloomclient.engine.BloomEngineClient"]
+		"client": [
+			"com.bloomclient.engine.BloomEngineClient",
+			"com.bloomclient.client.BloomClient"
+		]
 	},
-	"mixins": ["bloom-engine.mixins.json"],
+	"mixins": [
+		"bloom-engine.mixins.json",
+		"bloom-client.mixins.json"
+	],
 	"depends": {
 		"fabricloader": ">=0.20.1",
 		"minecraft": "~26.3",
